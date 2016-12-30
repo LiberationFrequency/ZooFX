@@ -15,8 +15,8 @@
 
 # Parse arguments
 usage() {
-    echo "Usage: $0 [-h] [-v] [-f FILE]"
-    echo "  -b  *Not implemented yet* Add on. Select bank. (A0 - J9)" # invalid character -
+    echo "Usage: $0 [-h] [-v] [-f /path/to/file.b3p]"
+    echo "  -b  *Not implemented yet* Need capital letters. Add on. Select bank. (A0 - J9)" # invalid character -
     echo "  -f  Specify a .b3p-file and transmit config to device."
     echo "  -h  Help. Display this message and quit."
     echo "  -p  Add on. Flip signal chain path forward/backward. (0 / 1)"
@@ -60,7 +60,7 @@ do
             exit 1
             ;;
         v)
-            echo "0.00.001 alpha" >&2
+            echo "0.00.002 alpha" >&2
             exit 1
             ;;
         *)
@@ -92,54 +92,112 @@ esac
 amidi -p hw:2 -S "F0 52 00 $mod 50 F7" -i 0.2
 
 
-#bankd=$(echo "ibase=16; $bank" | bc) 
-#bankk=160
-#banks=$(($bankd-$bankk)) 
-#amidi -p hw:2 -S "C0 $banks" >&2
-
-
-
-
 ## Patchname
 name=$(xmlstarlet sel -t -v "(/PatchData/Name)" -n "$2")
-n0=("${name:0:1} ${name:10}")
+#echo $name
+n0=("${name:0:1}")
+#echo $n0
 n0h=$(echo -n "$n0" | od -A n -t x1)
+#echo $n0h
+#case "$n0h" in
+#        20) n0h=20
+#            ;;
+#esac
+#echo $n0h
 amidi -p hw:2 -S "F0 52 00 $mod 31 04 00 $n0h 00 F7" -i 0.2
 
-n1=("${name:1:1} ${name:10}")
+n1=("${name:1:1}")
+#echo $n1
 n1h=$(echo -n "$n1" | od -A n -t x1)
+#echo $n1h
+#case "$n1h" in
+#        20) n1h=20
+#            ;;
+#esac
+#echo $n1h
 amidi -p hw:2 -S "F0 52 00 $mod 31 04 01 $n1h 00 F7" -i 0.2
 
-n2=("${name:2:1} ${name:10}")
+n2=("${name:2:1}")
+#echo $n2
 n2h=$(echo -n "$n2" | od -A n -t x1)
+#echo $n2h
+#case "$n2h" in
+#        20) n2h=20
+#            ;;
+#esac
+#echo $n2h
 amidi -p hw:2 -S "F0 52 00 $mod 31 04 02 $n2h 00 F7" -i 0.2
 
-n3=("${name:3:1} ${name:10}")
+n3=("${name:3:1}")
+#echo $n3
 n3h=$(echo -n "$n3" | od -A n -t x1)
+#echo $n3h
+#case "$n3h" in
+#        20) n3h=20
+#            ;;
+#esac
+#echo $n3h
 amidi -p hw:2 -S "F0 52 00 $mod 31 04 03 $n3h 00 F7" -i 0.2
 
-n4=("${name:4:1} ${name:10}")
+n4=("${name:4:1}")
+#echo $n4
 n4h=$(echo -n "$n4" | od -A n -t x1)
+#echo $n4h
+#case "$n4h" in
+#        20) n4h=20
+#            ;;
+#esac
+#echo $n4h
 amidi -p hw:2 -S "F0 52 00 $mod 31 04 04 $n4h 00 F7" -i 0.2
 
-n5=("${name:5:1} ${name:10}")
+n5=("${name:5:1}")
+#echo $n5
 n5h=$(echo -n "$n5" | od -A n -t x1)
+#echo $n5h
+#case "$n5h" in
+#        20) n5h=20
+#            ;;
+#esac
+#echo $n5h
 amidi -p hw:2 -S "F0 52 00 $mod 31 04 05 $n5h 00 F7" -i 0.2
 
-n6=("${name:6:1} ${name:10}")
+n6=("${name:6:1}")
+#echo $n6
 n6h=$(echo -n "$n6" | od -A n -t x1)
+#echo $n6h
+#case "$n6h" in
+#        20) n6h=20
+#            ;;
+#esac
+#echo $n6h
 amidi -p hw:2 -S "F0 52 00 $mod 31 04 06 $n6h 00 F7" -i 0.2
 
-n7=("${name:7:1} ${name:10}")
+n7=("${name:7:1}")
+#echo $n7
 n7h=$(echo -n "$n7" | od -A n -t x1)
+#echo $n7h
+case "$n7h" in
+        20) n7h=20
+            ;;
+esac
+#echo $n7h
 amidi -p hw:2 -S "F0 52 00 $mod 31 04 07 $n7h 00 F7" -i 0.2
 
-n8=("${name:8:1} ${name:10}")
+n8=("${name:8:1}")
+#echo $n8
 n8h=$(echo -n "$n8" | od -A n -t x1)
+#echo $n8h
+#case $n8h in
+#        (2a) $n8h=20
+#            ;;
+#esac
+#echo $n8h
 amidi -p hw:2 -S "F0 52 00 $mod 31 04 08 $n8h 00 F7" -i 0.2
 
-n9=("${name:9:1} ${name:10}")
+n9=("${name:9:1}")
+#echo $n9
 n9h=$(echo -n "$n9" | od -A n -t x1)
+#echo $n9h
 amidi -p hw:2 -S "F0 52 00 $mod 31 04 09 $n9h 00 F7" -i 0.2
 
 
@@ -333,7 +391,7 @@ amidi -p hw:2 -S "F0 52 00 $mod 31 03 0A $m3p7h 00 F7" -i 0.2
 
 ## Wait (for too long), but otherwise the Patch will reverse and the message not accepted.
 ## Or let the device open. 
-sleep 5.2
+sleep 5.1
 ## Lock device again:
 amidi -p hw:2 -S "F0 52 00 $mod 51 F7"
 

@@ -1,11 +1,12 @@
 #!/bin/bash
 
-## Proof of concept, how to backup a single Patch and the whole bank from a ZFXB3 at same time.
+## Proof of concept, how to backup a single Patch and the whole bank from a ZFXB3
+## and convert it to several formats simultaneously.
 ## It reads the name of the patch and set it as filename.
 ## It creates a (amidi) SysEx file, and a human readable plain text file.
 ## Not ready yet.
 ## e.g.
-## ./zoofxbackup.sh -s /save/to/path/
+## ./zfxbackup.sh -s /save/to/path/
 
 
 
@@ -15,12 +16,13 @@ usage() {
 
     echo "  -h  Help. Display this message and quit."
     echo "  -s  Save bank to directory. e.g. ./zfxbackup.sh -s /home/user/Desktop/ZFXB3_Patches/Bankname"
-    echo "  -t  *Not implemented yet* Transmit bank to device."
+    echo "  -t  *Not implemented yet* Transmit bank back to device."
     echo "  -v  Version. Print version number and quit."
     exit
 }
 
-
+date=$(date)
+mod=4F
 dirname=""
 optspec="hvs:"
 while getopts "$optspec" optchar
@@ -35,7 +37,7 @@ do
             dirname="$OPTARG"
             ;;
         v)
-            echo "0.00.001 alpha" >&2
+            echo "0.00.002 alpha"
             exit 1
             ;;
     	:) 
@@ -75,10 +77,10 @@ fi
 
 
 ## Unlock device:
-amidi -p hw:2 -S "F0 52 00 4F 50 F7" -i 0.15 >&2
+amidi -p hw:2 -S "F0 52 00 $mod 50 F7" -i 0.15
 
 ## Store the current bank position before start backup
-pos=$(amidi -p hw:2 -S "F0 52 00 4F 33 F7" -d -t 0.15)
+pos=$(amidi -p hw:2 -S "F0 52 00 $mod 33 F7" -d -t 0.15)
 poscut=("${pos:19:27}")
 
 
@@ -89,10 +91,10 @@ for i in $(seq 0 99); do
   varh=$(echo 16o${var}p |dc)
 
   ## Change Patch from A0 to J9:
-  amidi -p hw:2 -S "C0 $varh" >&2
+  amidi -p hw:2 -S "C0 $varh" -i 0.15
 
   ## Request current patch configuration:
-  patchname=$(amidi -p hw:2 -S "F0 52 00 4F 29 F7" -d -t 0.15)
+  patchname=$(amidi -p hw:2 -S "F0 52 00 $mod 29 F7" -d -t 0.15)
   #echo "Patch: $patchname"
 
   ## Cut the answer to position of hex filename:
@@ -100,19 +102,23 @@ for i in $(seq 0 99); do
   #echo "Cut: $namecut"
 
   ## Convert hex to string:
-  namecuts=$(echo "$namecuth" | xxd -r -p)
-  #echo "Hex Cut: $namecuts"
+#  namecuts=$(echo "$namecuth" | xxd -r -p) 
+#  xxd is a part of vim / unnecessary dependency
+  namecuts=$(for c in `echo "$namecuth"`; do printf "\x$c"; done;)
+#  echo "Hex Cut: $namecuts"
 
   ## Save Patch to a plain text file:
-  echo "Patchname: $namecuts" > $dirname/"$namecuts".txt
+  echo $date > $dirname/"$namecuts".txt
+  echo "Patchname: $namecuts" >> $dirname/"$namecuts".txt
   echo "SysEx Message:" >> $dirname/"$namecuts".txt
   echo $patchname >> $dirname/"$namecuts".txt
+  echo "Path: $dirname" >> $dirname/"$namecuts".txt
   echo "Description:" >> $dirname/"$namecuts".txt
   
   ## Save Patch to (amidi) SysEx file:
-  amidi -p hw:2 -S "F0 52 00 4F 29 F7" -r $dirname/"$namecuts".syx -t 0.15
+  amidi -p hw:2 -S "F0 52 00 $mod 29 F7" -r $dirname/"$namecuts".syx -t 0.15
 
-  ## Save Patch to a .b3p file. Need to reverse engineering the message for the complete patch before.
+  ## Save Patch to a .b3p file. Need to reverse engineering the message for the complete patch first.
   ## Save complete bank to an own .xml-file-structure:
   ## 
 
@@ -125,4 +131,4 @@ amidi -p hw:2 -S "$poscut"
 
 sleep 0.15
 ## Lock device again:
-amidi -p hw:2 -S "F0 52 00 4F 51 F7" -i 0.15 >&2
+amidi -p hw:2 -S "F0 52 00 $mod 51 F7" -i 0.15 >&2
