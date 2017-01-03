@@ -5,6 +5,10 @@ Patch = The whole configuration of one signal chain, etc. you edited.
 Bank = The whole storage of max. 100 patches. (A0-J9)  
 
 FYI: amidi -hw:2 can directed to other ports in other setups.  
+  
+upper case SysEx messages = transmit to device  
+lower case SysEx messages = receive from device  
+  
 
 Not complete yet... to be continued...  
 
@@ -36,7 +40,22 @@ amidi -p hw:2 -S "F0 52 00 4F 33 F7"
 
 Request the current patch configuration:  
 amidi -p hw:2 -S "F0 52 00 4F 29 F7"  
+  
+Request the system version:  
+amidi -p hw:2 -S "F0 7E 00 06 01 F7"  
+Answer:  
+f0 7e 00 06 02 52 4f 00  00 00 31 2e 32 30 f7  
+52 = Vendor ID  
+4f = Model ID  
+31 2e 32 30 = 1.20    
 
+  
+Request ???:  
+amidi -p hw:2 -S "F0 52 00 4F 2B F7"  
+Answer:  
+F0 52 00 4F 2A 01 54 00 0F 58 00 00 10 00 01 00 19 00 F7  
+  
+  
 
 Change the preset:  
 -----------------------------------------------
@@ -89,41 +108,104 @@ Right (Module2):
 amidi -p hw:2 -S "F0 52 00 4f 31 02 01 09 00 f7"  
 
 
-Sort it like in the firmware!:  
-D Comp:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;amidi -p hw:2 -S "F0 52 00 4F 31 02 01 10 00 F7"  
-M Comp:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;amidi -p hw:2 -S "F0 52 00 4F 31 02 01 11 00 F7"  
-DualComp:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;amidi -p hw:2 -S "F0 52 00 4F 31 02 01 44 00 F7"  
-Slow Attck:&nbsp;&nbsp;&nbsp;&nbsp;amidi -p hw:2 -S "F0 52 00 4F 31 02 01 12 00 F7"  
-ZNR:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;amidi -p hw:2 -S "f0 52 00 4f 31 02 01 13 00 f7"  
-GraphicEQ:&nbsp;&nbsp;&nbsp;amidi -p hw:2 -S "F0 52 00 4F 31 02 01 14 00 F7"  
-ParaEQ:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;amidi -p hw:2 -S "F0 52 00 4F 31 02 01 15 00 F7"  
-Splitter:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;amidi -p hw:2 -S "F0 52 00 4F 31 02 01 47 00 F7"  
-BottomB:  
-Exciter:  
-CombFLTR:&nbsp;&nbsp;&nbsp;&nbsp;amidi -p hw:2 -S "F0 52 00 4F 31 02 01 16 00 F7"  
-AutoWah:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;amidi -p hw:2 -S "F0 52 00 4F 31 02 01 17 00 F7"  
-Z-Tron:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 18 00 F7"  
-M-Filter:  
-A-Filter:  
-Step:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 19 00 F7"  
-  
-StereoCho:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 20 00 F7"  
-  
-  
-Bit Crush: 	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 09 00 F7"  
-Bomber:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 0a 00 F7"  
-  
+Sort it like in the firmware!:    
+This will transform the inverted comma to an invalid character, so you can't copy and paste it any more.  
+| Preset | Command |
+| --- | --- |
+|OptComp:    |amidi -p hw:2 -S "F0 52 00 4F 31 02 01 43 00 F7"|   
+|D Comp:    |amidi -p hw:2 -S "F0 52 00 4F 31 02 01 10 00 F7"|  
+|M Comp:    |amidi -p hw:2 -S "F0 52 00 4F 31 02 01 11 00 F7"|
+|DualComp:    |amidi -p hw:2 -S "F0 52 00 4F 31 02 01 44 00 F7"|  
+|160Comp:    |amidi -p hw:2 -S "F0 52 00 4F 31 02 01 45 00 F7"|  
+|Limiter:    |amidi -p hw:2 -S "F0 52 00 4F 31 02 01 46 00 F7"|  
+|Slow Attck:   |amidi -p hw:2 -S "F0 52 00 4F 31 02 01 12 00 F7"|  
+|ZNR:    |amidi -p hw:2 -S "F0 52 00 4F 31 02 01 13 00 F7"|  
+|GraphicEQ:    |amidi -p hw:2 -S "F0 52 00 4F 31 02 01 14 00 F7"|  
+|ParaEQ:    |amidi -p hw:2 -S "F0 52 00 4F 31 02 01 15 00 F7"|  
+|Splitter:    |amidi -p hw:2 -S "F0 52 00 4F 31 02 01 47 00 F7"|  
+|BottomB:    |amidi -p hw:2 -S "F0 52 00 4F 31 02 01 48 00 F7"|    
+|Exciter:    |amidi -p hw:2 -S "F0 52 00 4F 31 02 01 49 00 F7"|    
+|CombFLTR:    |amidi -p hw:2 -S "F0 52 00 4F 31 02 01 16 00 F7"|  
+|AutoWah:    |amidi -p hw:2 -S "F0 52 00 4F 31 02 01 17 00 F7"|  
+|Z-Tron:    |amidi -p hw:2 -S "F0 52 00 4F 31 02 01 18 00 F7"|  
 M-Filter:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 01 00 F7"  
-  
+A-Filter:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 4A 00 F7"    
+Cry:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 1A 00 F7"  
+Step:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 19 00 F7"  
+SeqFilter:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 0C 00 F7"    
+RandomFilter:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 0D 00 F7"    
+Booster:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 4C 00 F7"    
+Overdrive:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 4B 00 F7"    
+BassMuff:  
+TScream:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 3B 00 F7"    
+Dist1:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 3C 00 F7"    
+Squeak:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 3D 00 F7"    
+FuzzSmile:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 3E 00 F7"    
+GreatMuff:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 3F 00 F7"    
+MetalWRLD:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 40 00 F7"    
+BassDrive:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 4F 00 F7"    
+D.I+:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 50 00 F7"    
+BassBB:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 4d 00 F7"     
+DI5:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 51 00 F7"    
+BassPre:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 52 00 F7"  
+AcBsPre:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 53 00 F7"    
+SVT:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 54 00 F7"    
+B-Man:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 55 00 F7"    
+Hrt-3500:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 56 00 F7"    
+SMR:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 57 00 F7"    
+FlipTop:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 58 00 F7"    
+Acoustic:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 59 00 F7"    
+Agamp:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 5A 00 F7"    
+Monotone:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 5B 00 F7"   
+Super B:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 5C 00 F7"    
+G-Krueger:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 5D 00 F7"  
+Heaven:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 5E 00 F7"  
+MarkB:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 5F 00 F7"    
+Tremolo:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 1C 00 F7"    
+Slicer:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 04 00 F7"  
+4-Phaser:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 60 00 F7"    
+8-Phaser:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 61 00 F7"    
+The Vibe:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 02 00 F7"  
+Duo-Phase:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 0B 00 F7"    
+WarpPhaser:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 0E 00 F7"    
+Chorus:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 1E 00 F7"    
+Detune:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 1F 00 F7"    
+VintageCE:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 20 00 F7"    
+StereoCho:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 21 00 F7"  
+Ensemble:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 22 00 F7"    
+VinFLNGR:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 23 00 F7"    
+Flanger:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 42 00 F7"    
+DynaFLNGR:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 24 00 F7"    
+Vibrato: 	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 25 00 F7"   
+Octave:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 1B 00 F7"    
+PitchSHFT:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 26 00 F7"    
+MonoPitch:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 28 00 F7"    
+HPS:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 29 00 F7"    
+BendCho:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 27 00 F7"    
+RingMod:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 1D 00 F7"      
+Bit Crush: 	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 09 00 F7"  
+Bomber:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 0A 00 F7"  
+MonoSyn:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 62 00 F7"    
 StdSyn:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 63 00 F7"  
+SynTlk:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 64 00 F7"    
+V-Syn:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 65 00 F7"    
+4ChoiceSyn:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 66 00 F7"   
 Z-Syn:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 67 00 F7"  
 Z-Organ:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 03 00 F7"  
 Defret:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 68 00 F7"  
-  
+Delay:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 2A 00 F7"    
+TapeEcho:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 2B 00 F7"    
+ModDealay:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 2C 00 F7"    
+AnalogDLY:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 2D 00 F7"    
+ReverseDelay:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 2E 00 F7"    
+MultiTapDelay:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 2F 00 F7"  
+Dyna Delay:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 30 00 F7"    
 FilterDIY:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 06 00 F7"  
 PitchDelay:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 07 00 F7"  
 StereoDelay:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 08 00 F7"  	
 PhaseDIY	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 05 00 F7"  
+TriggerHoldDly:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 0F 00 F7"    
+HD Reverb:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 41 00 F7"    
 Hall:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 31 00 F7"  
 Room:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 32 00 F7"  
 TiledRM:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 33 00 F7"  
@@ -131,12 +213,20 @@ Spring:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 34 00 F7"
 Arena Reverb:   amidi -p hw:2 -S "F0 52 00 4F 31 02 01 35 00 F7"   
 EarlyReflection	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 36 00 F7"  
 Air:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 37 00 F7"  
-  
+CompDist:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 6B 00 F7"  
+OctDist:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 6C 00 F7"    
+AWahDist:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 6d 00 F7"    
+CompAWah:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 6e 00 F7"   
+PH+Dist:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 6f 00 F7" and above       
+PedalVox:  
 PedalWah:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 69 00 F7"  
+PDL Reso:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 6A 00 F7"  
+PDL Pitch:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 39 00 F7"  
+PdlMnPit:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 3a 00 F7"    
+    
   
-Slicer:		amidi -p hw:2 -S "F0 52 00 4F 31 02 01 04 00 F7"  
-The Vibe:	amidi -p hw:2 -S "F0 52 00 4F 31 02 01 02 00 F7"  
-
+  
+  
 
 Change Tempo:  
 --------------------------------------------------------------------
@@ -195,16 +285,16 @@ Space
      F0 52 00 4F 31 04 00 20 00 F7  
 
 ! =  F0 52 00 4F 31 04 00 21 00 F7  
-(hash)# =  F0 52 00 4F 31 04 00 23 00 F7  
+\# =  F0 52 00 4F 31 04 00 23 00 F7  
 $ =  F0 52 00 4F 31 04 00 24 00 F7  
 % =  F0 52 00 4F 31 04 00 25 00 F7  
 & =  F0 52 00 4F 31 04 00 26 00 F7  
 ' =  F0 52 00 4F 31 04 00 27 00 F7  
 ( =  F0 52 00 4F 31 04 00 28 00 F7  
 ) =  F0 52 00 4F 31 04 00 29 00 F7  
-(plus)+ =  F0 52 00 4F 31 04 00 2B 00 F7  
+\+ =  F0 52 00 4F 31 04 00 2B 00 F7  
 , =  F0 52 00 4F 31 04 00 2C 00 F7  
-(dash)- =  F0 52 00 4F 31 04 00 2D 00 F7  
+\- =  F0 52 00 4F 31 04 00 2D 00 F7  
 . =  F0 52 00 4F 31 04 00 2E 00 F7  
 ; =  F0 52 00 4F 31 04 00 3B 00 F7  
 = =  F0 52 00 4F 31 04 00 3D 00 F7  
@@ -218,7 +308,7 @@ _ =  F0 52 00 4F 31 04 00 5F 00 F7
 } =  F0 52 00 4F 31 04 00 7D 00 F7  
 ~ =  F0 52 00 4F 31 04 00 7E 00 F7  
 
-(xxx) = syntax compensation for now  
+  
 
 
 
@@ -277,9 +367,38 @@ Flip signal path forward/backward:
 F0 52 00 4F 31 03 09 0x 00 F7  
 
 
-Im Total-Modus  
+Im Total-Modus 
+---------------------------------------------------------- 
 Level: F0 52 00 4F 31 03 02 xx 00 F7  
+  
 
+change the order of the presets ???:  
+Example Chain 1 original to one step forward (right)..   
+    
+F0 52 00 4F   
+28 04   
+71 14 00 05   
+68 03 03 00 07 64 05 64 64   
+29 18 00 00 03 60 00 0C 0C 0C 08 0C 64 0C   
+0B 4C 40 09   
+00   
+30 00 00 52 00 00 00 00 00   
+56 00 00 00 00 40 00 0B   
+31 36 30 41 69 72 00 41 6D 70 20   
+00 F7  
+  
+  
+F0 52 00 4F   
+28 40   
+0B 4C 40 09   
+30 00 00 00 52 00 00 00 00   
+29 18 00 00 03 60 00 0C 0C 0C 00 0C 64 0C   
+71 14 00 05   
+40 68 03 03 07 64 05 64 00 64   
+56 00 00 00 00 40 00 0B   
+31 36 30 41 69 72 00 41 6D 70 20   
+00 F7  
+  
 
 The 32er line:  
 ---------------------------------------------------------------------
@@ -308,11 +427,13 @@ yy = arbitrarily
 
 
 
+
 Appendix:  
 ------------------------------------------------------------------------
 
 (1) The structure of a .b3p-file:  
 ----------------------------------
+```xml
 <?xml version="1.0" encoding="UTF-8"?>  
   
 <PatchData>  
@@ -389,7 +510,8 @@ Appendix:
 </PatchData>  
   
   
-  
+```  
+ 
   
   
   
@@ -495,6 +617,7 @@ F0 52 00 4F 28 00 7F 02 40 16 50 01 32 00 00 00 00 00 00 27 2E 10 40 00 10 02 00
 
 The associated XML-file looks like that:  
   
+```xml   
 <?xml version="1.0" encoding="UTF-8"?>  
   
 <PatchData>  
@@ -570,6 +693,9 @@ The associated XML-file looks like that:
   </Module4>  
 </PatchData>  
   
-  
+ 
+```
+ 
+
 
 
