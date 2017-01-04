@@ -1,18 +1,20 @@
 
 # Preliminary information  
   
+  
+  
 What is a ...? 
 
-| Preset | Command | 
+| Buzzword | Description | 
 | --- | --- | 
 | Preset | The effect itself, integrated in the firmware.|  
 | Patch | The whole configuration of one signal chain, etc. you edited.|  
 | Bank | The whole storage of max. 100 patches. (A0-J9)|  
 
-FYI: amidi -hw:2 can directed to other ports in other setups.  
+FYI: amidi -hw:2,0,0 can directed to other ports in other setups.  
   
-upper case SysEx messages = transmit to device  
-lower case SysEx messages = receive from device  
+Upper case SysEx messages = transmit to device  
+Lower case SysEx messages = receive from device  
   
 
 Not complete yet... to be continued...  
@@ -36,7 +38,8 @@ F0 52 00 4F 31 01 00 00 00 F7
   
 
 # Dialogs with the device  
-
+  
+  
 
 (Un)Lock and requests:  
 -----------------------------------------------
@@ -74,29 +77,68 @@ amidi -p hw:2 -S "F0 52 00 4F 29 F7"
 ... see appendix (2) for further information.  
     
  
-Request Tempo and ???:  
+Request Tempo, Global Level and ???:  
 amidi -p hw:2 -S "F0 52 00 4F 2B F7"  
 Different answers:  
 f0 52 00 4f 2a 01 54 00 0f 58 00 00 10 00 01 00 19 00 f7  
 f0 52 00 4f 2a 10 21 00 1d 54 00 00 40 00 01 00 19 00 f7    
 f0 52 00 4f 2a 01 00 00 0a 5c 00 00 10 00 01 00 19 00 f7  
-  
-| BPM | Respons | 
-| --- | --- |
-|  40 | f0 52 00 4f 2a 01 00 00 0a 5c 00 00 10 00 01 00 19 00 f7 |  
-|  41 | f0 52 00 4f 2a 01 00 40 0a 5c 00 00 10 00 01 00 19 00 f7 | 
-|  42 | f0 52 00 4f 2a 21 00 00 0a 5c 00 00 10 00 01 00 19 00 f7 | 
-|  43 | f0 52 00 4f 2a 21 00 40 0a 5c 00 00 10 00 01 00 19 00 f7 | 
-|  44 | f0 52 00 4f 2a 01 00 00 0b 5c 00 00 10 00 01 00 19 00 f7 | 
-| ... |                                                          |
-| 127 | f0 52 00 4f 2a 21 00 40 1f 5c 00 00 10 00 01 00 19 00 f7 | 
-| 128 | f0 52 00 4f 2a 01 00 00 20 5c 00 00 10 00 01 00 19 00 f7 | 
-| 129 | f0 52 00 4f 2a 01 00 40 20 5c 00 00 10 00 01 00 19 00 f7 | 
-| ... |                                                          |
-| 250 | f0 52 00 4f 2a 21 00 00 3e 5c 00 00 10 00 01 00 19 00 f7 |  
-  
-  
 
+
+
+f0 52 00 4f 2a 00 64 00 1e 56 00 00 40 00 01 00 19 00 f7  
+  
+Battery:  
+...2a xx 64... / 00=Alkaline / 10=Ni-MH  
+  
+Global Level:  
+... 2a 00 xx 00... (64 hex = 100 decimal)  
+  
+Signal Path:  
+... 00 1e 56 ... / 1e= ->1->2->3-> / 5e= <-1<-2<-3<- / different?       
+  
+Light:     
+...00 64 xx 1e ... / 00=on 01=1sec ...0a=10sec etc.  
+  
+Rec Gain:  
+...64 00 1e xx 00... / 0db=56 1db=57  
+  
+  
+Rhythmus Level
+...2a 0y 64 00 1e 56 00 00 xx 00... / 80=40(xx) / 81=44 / 82=48 /.../ 95=7c (max)  
+...2a 01 64 00 1e 56 00 00 00 00... / 96=00(xx)+01(0y)  
+...2a 01 64 00 1e 56 00 00 04 00... / 97  
+...2a 01 64 00 1e 56 00 00 10 00... / 100  
+  
+Rhythm Pattern:  
+...2a 0y 64 00 1e 56 00 x0 40 00... / x=00&y=00 = Guide / x=10&y=00 = 8Beat1 / x=up to 70   
+...2a 02 64 00 1e 56 00 30 40 00... / x=30&y=02 = Metal2  
+  
+  
+| BPM | Response | 
+| --- | --- |
+|  40 | f0 52 00 4f 2a 00 64 00 0a 56 00 00 40 00 01 00 19 00 f7 |  
+|  41 | f0 52 00 4f 2a 00 64 40 0a 56 00 00 40 00 01 00 19 00 f7 | 
+|  42 | f0 52 00 4f 2a 20 64 00 0a 56 00 00 40 00 01 00 19 00 f7 | 
+|  43 | f0 52 00 4f 2a 20 64 40 0a 56 00 00 40 00 01 00 19 00 f7 | 
+|  44 | f0 52 00 4f 2a 00 64 00 0b 56 00 00 40 00 01 00 19 00 f7 | 
+| ... |                                                          |
+| 127 | f0 52 00 4f 2a 20 64 40 1f 56 00 00 40 00 01 00 19 00 f7 | 
+| 128 | f0 52 00 4f 2a 00 64 00 20 56 00 00 40 00 01 00 19 00 f7 | 
+| 129 | f0 52 00 4f 2a 00 64 40 20 56 00 00 40 00 01 00 19 00 f7 | 
+| ... |                                                          |
+| 250 | f0 52 00 4f 2a 20 64 00 3e 56 00 00 40 00 01 00 19 00 f7 |  
+  
+  
+Tuner:  
+...2a 0y 64 00 1e xx 00... / 440Hz=56 / 441Hz=66 / 443Hz=06(xx)+08(0y)  
+  
+...1e 56 xx 0y... /Type Chromatic=00/Bassbx0=10 00/Bassbx1=10 01/Bassbx2= 10 02/Bassbx3= 10 03  
+  
+Looper:  
+  
+  
+  
 other answers:  
 f0 52 00 4f 00 00 f7 = ??? confirm / okay ???  
 f0 52 00 4f 20 00 f7 = ??? refused ???  
@@ -107,17 +149,112 @@ f0 52 00 4f 32 01 00 00 40 00 00 00 00 00 f7 = confirm saving patch to current p
 Change the preset:  
 -----------------------------------------------
 ... as Control Change Messages:  
-A0 = amidi -p hw:2 -S "C0 00"  
-A1 = amidi -p hw:2 -S "C0 01"  
-A2 = amidi -p hw:2 -S "C0 02"  
-A9 = amidi -p hw:2 -S "C0 09"  
-B0 = amidi -p hw:2 -S "C0 0A"  
-B1 = amidi -p hw:2 -S "C0 0B"  
-...  
-D1 = amidi -p hw:2 -S "C0 1F"  
-... and so on in hexadecimal up to  
-J9 = amidi -p hw:2 -S "C0 63"  
 
+| Bank | CC | Command | 
+| --- | --- | --- |
+| A0 | 00 | amidi -p hw:2,0,0 -S "C0 00" |  
+| A1 | 01 | amidi -p hw:2,0,0 -S "C0 01" | 
+| A2 | 02 | amidi -p hw:2,0,0 -S "C0 02" |
+| A3 | 03 | amidi -p hw:2,0,0 -S "C0 03" |
+| A4 | 04 | amidi -p hw:2,0,0 -S "C0 04" |
+| A5 | 05 | amidi -p hw:2,0,0 -S "C0 05" |
+| A6 | 06 | amidi -p hw:2,0,0 -S "C0 06" |
+| A7 | 07 | amidi -p hw:2,0,0 -S "C0 07" |
+| A8 | 08 | amidi -p hw:2,0,0 -S "C0 08" |
+| A9 | 09 | amidi -p hw:2,0,0 -S "C0 09" | 
+| B0 | 0A | amidi -p hw:2,0,0 -S "C0 0A" | 
+| B1 | 0B | amidi -p hw:2,0,0 -S "C0 0B" |
+| B2 | 0C | amidi -p hw:2,0,0 -S "C0 0C" |
+| B3 | 0D | amidi -p hw:2,0,0 -S "C0 0D" |
+| B4 | 0E | amidi -p hw:2,0,0 -S "C0 0E" |
+| B5 | 0F | amidi -p hw:2,0,0 -S "C0 0F" |
+| B6 | 10 | amidi -p hw:2,0,0 -S "C0 10" |
+| B7 | 11 | amidi -p hw:2,0,0 -S "C0 11" |
+| B8 | 12 | amidi -p hw:2,0,0 -S "C0 12" |
+| B9 | 13 | amidi -p hw:2,0,0 -S "C0 13" |
+| C0 | 14 | amidi -p hw:2,0,0 -S "C0 14" |
+| C1 | 15 | amidi -p hw:2,0,0 -S "C0 15" |
+| C2 | 16 | amidi -p hw:2,0,0 -S "C0 16" |
+| C3 | 17 | amidi -p hw:2,0,0 -S "C0 17" |
+| C4 | 18 | amidi -p hw:2,0,0 -S "C0 18" |
+| C5 | 19 | amidi -p hw:2,0,0 -S "C0 19" |
+| C6 | 1A | amidi -p hw:2,0,0 -S "C0 1A" |
+| C7 | 1B | amidi -p hw:2,0,0 -S "C0 1B" |
+| C8 | 1C | amidi -p hw:2,0,0 -S "C0 1C" |
+| C9 | 1D | amidi -p hw:2,0,0 -S "C0 1D" |
+| D0 | 1E | amidi -p hw:2,0,0 -S "C0 1E" |
+| D1 | 1F | amidi -p hw:2,0,0 -S "C0 1F" |
+| D2 | 20 | amidi -p hw:2,0,0 -S "C0 20" |
+| D3 | 21 | amidi -p hw:2,0,0 -S "C0 21" |
+| D4 | 22 | amidi -p hw:2,0,0 -S "C0 22" |
+| D5 | 23 | amidi -p hw:2,0,0 -S "C0 23" |
+| D6 | 24 | amidi -p hw:2,0,0 -S "C0 24" |
+| D7 | 25 | amidi -p hw:2,0,0 -S "C0 25" |
+| D8 | 26 | amidi -p hw:2,0,0 -S "C0 26" |
+| D9 | 27 | amidi -p hw:2,0,0 -S "C0 27" |
+| E0 | 28 | amidi -p hw:2,0,0 -S "C0 28" |
+| E1 | 29 | amidi -p hw:2,0,0 -S "C0 29" |
+| E2 | 2A | amidi -p hw:2,0,0 -S "C0 2A" |
+| E3 | 2B | amidi -p hw:2,0,0 -S "C0 2B" |
+| E4 | 2C | amidi -p hw:2,0,0 -S "C0 2C" |
+| E5 | 2D | amidi -p hw:2,0,0 -S "C0 2D" |
+| E6 | 2E | amidi -p hw:2,0,0 -S "C0 2E" |
+| E7 | 2F | amidi -p hw:2,0,0 -S "C0 2F" |
+| E8 | 30 | amidi -p hw:2,0,0 -S "C0 30" |
+| E9 | 31 | amidi -p hw:2,0,0 -S "C0 31" |
+| F0 | 32 | amidi -p hw:2,0,0 -S "C0 32" |
+| F1 | 33 | amidi -p hw:2,0,0 -S "C0 33" |
+| F2 | 34 | amidi -p hw:2,0,0 -S "C0 34" |
+| F3 | 35 | amidi -p hw:2,0,0 -S "C0 35" |
+| F4 | 36 | amidi -p hw:2,0,0 -S "C0 36" |
+| F5 | 37 | amidi -p hw:2,0,0 -S "C0 37" |
+| F6 | 38 | amidi -p hw:2,0,0 -S "C0 38" |
+| F7 | 39 | amidi -p hw:2,0,0 -S "C0 39" |
+| F8 | 3A | amidi -p hw:2,0,0 -S "C0 3A" |
+| F9 | 3B | amidi -p hw:2,0,0 -S "C0 3B" |
+| G0 | 3C | amidi -p hw:2,0,0 -S "C0 3C" |
+| G1 | 3D | amidi -p hw:2,0,0 -S "C0 3D" |
+| G2 | 3E | amidi -p hw:2,0,0 -S "C0 3E" |
+| G3 | 3F | amidi -p hw:2,0,0 -S "C0 3F" |
+| G4 | 40 | amidi -p hw:2,0,0 -S "C0 40" |
+| G5 | 41 | amidi -p hw:2,0,0 -S "C0 41" |
+| G6 | 42 | amidi -p hw:2,0,0 -S "C0 42" |
+| G7 | 43 | amidi -p hw:2,0,0 -S "C0 43" |
+| G8 | 44 | amidi -p hw:2,0,0 -S "C0 44" |
+| G9 | 45 | amidi -p hw:2,0,0 -S "C0 45" |
+| H0 | 46 | amidi -p hw:2,0,0 -S "C0 46" |
+| H1 | 47 | amidi -p hw:2,0,0 -S "C0 47" |
+| H2 | 48 | amidi -p hw:2,0,0 -S "C0 48" |
+| H3 | 49 | amidi -p hw:2,0,0 -S "C0 49" |
+| H4 | 4A | amidi -p hw:2,0,0 -S "C0 4A" |
+| H5 | 4B | amidi -p hw:2,0,0 -S "C0 4B" |
+| H6 | 4C | amidi -p hw:2,0,0 -S "C0 4C" |
+| H7 | 4D | amidi -p hw:2,0,0 -S "C0 4D" |
+| H8 | 4E | amidi -p hw:2,0,0 -S "C0 4E" |
+| H9 | 4F | amidi -p hw:2,0,0 -S "C0 4F" |
+| I0 | 50 | amidi -p hw:2,0,0 -S "C0 50" |
+| I1 | 51 | amidi -p hw:2,0,0 -S "C0 51" |
+| I2 | 52 | amidi -p hw:2,0,0 -S "C0 52" |
+| I3 | 53 | amidi -p hw:2,0,0 -S "C0 53" |
+| I4 | 54 | amidi -p hw:2,0,0 -S "C0 54" |
+| I5 | 55 | amidi -p hw:2,0,0 -S "C0 55" |
+| I6 | 56 | amidi -p hw:2,0,0 -S "C0 56" |
+| I7 | 57 | amidi -p hw:2,0,0 -S "C0 57" |
+| I8 | 58 | amidi -p hw:2,0,0 -S "C0 58" |
+| I9 | 59 | amidi -p hw:2,0,0 -S "C0 59" |
+| I0 | 50 | amidi -p hw:2,0,0 -S "C0 50" |
+| J0 | 5A | amidi -p hw:2,0,0 -S "C0 5A" |
+| J1 | 5B | amidi -p hw:2,0,0 -S "C0 5B" |
+| J2 | 5C | amidi -p hw:2,0,0 -S "C0 5C" |
+| J3 | 5D | amidi -p hw:2,0,0 -S "C0 5D" |
+| J4 | 5E | amidi -p hw:2,0,0 -S "C0 5E" |
+| J5 | 5F | amidi -p hw:2,0,0 -S "C0 5F" |
+| J6 | 60 | amidi -p hw:2,0,0 -S "C0 60" |
+| J7 | 61 | amidi -p hw:2,0,0 -S "C0 61" |
+| J8 | 62 | amidi -p hw:2,0,0 -S "C0 62" |
+| J9 | 63 | amidi -p hw:2,0,0 -S "C0 63" |
+
+  
 ... or as SysEx Message:  
 amidi -p hw:2 -S "F0 52 00 4F 32 C0 xx F7"  
 
@@ -397,8 +534,7 @@ x
 
 Global:  
 ----------------------------------------------------------
-Signalweg vorwärts/rückwarts (0x = 0 oder 1):
-Flip signal path forward/backward:    
+Flip signal path forward/backward (0x = 0 oder 1):    
 F0 52 00 4F 31 03 09 0x 00 F7  
 
 
@@ -409,30 +545,8 @@ Level: F0 52 00 4F 31 03 02 xx 00 F7
 
 change the order of the presets ???:  
 Example Chain 1 original to one step forward (right)..   
-    
-F0 52 00 4F   
-28 04   
-71 14 00 05   
-68 03 03 00 07 64 05 64 64   
-29 18 00 00 03 60 00 0C 0C 0C 08 0C 64 0C   
-0B 4C 40 09   
-00   
-30 00 00 52 00 00 00 00 00   
-56 00 00 00 00 40 00 0B   
-31 36 30 41 69 72 00 41 6D 70 20   
-00 F7  
   
   
-F0 52 00 4F   
-28 40   
-0B 4C 40 09   
-30 00 00 00 52 00 00 00 00   
-29 18 00 00 03 60 00 0C 0C 0C 00 0C 64 0C   
-71 14 00 05   
-40 68 03 03 07 64 05 64 00 64   
-56 00 00 00 00 40 00 0B   
-31 36 30 41 69 72 00 41 6D 70 20   
-00 F7  
   
 
 The 32er line:  
@@ -449,8 +563,17 @@ amidi -p hw:2 -S "F0 52 00 4F 32 C0 40 F7"
   
 in Control Change:  
 amidi -p hw:2 -S "C0 40"  
-
-
+  
+  
+  
+Midi footpedal:
+---------------------------------------------------------------------
+If you disable the lock, you get the value of a footpedal per SysEx.  
+f0 52 00 4f xx 1a f7  
+  
+  
+ 
+  
 SysEx of Death:  
 --------------------------------------------------------------------- 
 If you send these messages, the ZFXB3 will crash, and have to reboot. Be careful!  
