@@ -14,9 +14,9 @@ A collection of shell scripts that use SysEx messages to interact with a Zoom® 
 
 Requirements:  
 ------------------  
-* Zoom® Effect unit (B3)
+* Zoom® Effect unit (B3)  
 https://www.zoom-na.com/products/guitar-bass-effects/bass/zoom-b3-bass-effects-amp-simulator-pedal  
-* GNU/Linux
+* GNU/Linux  
 * Amidi  
 http://alsa.opensrc.org/Amidi
 

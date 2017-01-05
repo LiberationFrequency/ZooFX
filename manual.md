@@ -11,6 +11,7 @@ What is a ...?
 | Patch | The whole configuration of one signal chain, etc. you edited.|  
 | Bank | The whole storage of max. 100 patches. (A0-J9)|  
 
+  
 FYI: amidi -hw:2,0,0 can directed to other ports in other setups.  
   
 Upper case SysEx messages = transmit to device  
@@ -18,9 +19,10 @@ Lower case SysEx messages = receive from device
   
 
 Not complete yet... to be continued...  
-
-
-## Structure of a System Exclusiv (SysEx) message:  
+  
+  
+## Structure of a System Exclusive (SysEx) message:  
+  
 e.g.  
 F0 52 00 4F 31 01 00 00 00 F7
 
@@ -43,12 +45,13 @@ F0 52 00 4F 31 01 00 00 00 F7
 
 (Un)Lock and requests:  
 -----------------------------------------------
-Standard request to identify devices (Who are you?):  
+  
+General request to identify devices (Who are you?):  
 amidi -p hw:2 -S "F0 7E 00 06 01 F7"  
   Answer:  
   f0 7e 00 06 02 52 4f 00  00 00 31 2e 32 30 f7   
-06 = ???  
-02 = ???   
+06 = General Information    
+02 = Identity Reply     
 52 = Manufacturer ID  
 4f = Model ID  
 31 2e 32 30 = 1.20   
@@ -57,45 +60,47 @@ amidi -p hw:2 -S "F0 7E 00 06 01 F7"
 Unlock device:  
 amidi -p hw:2 -S "F0 52 00 4F 50 F7"   
 ...no answer.  
-
+  
+  
 Lock device again:  
 amidi -p hw:2 -S "F0 52 00 4F 51 F7"  
 If the device is locked, the patch will be reset. Does not work for adjustments inside the totalmodus.  
 ...no answer.  
   
-
+  
 Request current position in bank:  
 amidi -p hw:2 -S "F0 52 00 4F 33 F7"  
 Answer:  
-B0 00 00  
-B0 20 00   
-C0 00   <- Channel A0  
+B0 00 00 <- ?CC: Bank MSB -Most Significant Byte?  
+B0 20 00 <- ?CC: Bank LSB -Least Significant Byte?      
+C0 2B  <- Bank E3    
   
   
 Request the current patch configuration:  
 amidi -p hw:2 -S "F0 52 00 4F 29 F7"  
 ... see appendix (2) for further information.  
     
- 
-Request Tempo, Global Level and ???:  
+  
+Request global configuration and ???:  
+(move it to appendix, when ready)  
 amidi -p hw:2 -S "F0 52 00 4F 2B F7"  
 Different answers:  
 f0 52 00 4f 2a 01 54 00 0f 58 00 00 10 00 01 00 19 00 f7  
 f0 52 00 4f 2a 10 21 00 1d 54 00 00 40 00 01 00 19 00 f7    
 f0 52 00 4f 2a 01 00 00 0a 5c 00 00 10 00 01 00 19 00 f7  
-
-
-
+  
+  
+  
 f0 52 00 4f 2a 00 64 00 1e 56 00 00 40 00 01 00 19 00 f7  
   
 Battery:  
 ...2a xx 64... / 00=Alkaline / 10=Ni-MH  
   
-Global Level:  
+Level:  
 ... 2a 00 xx 00... (64 hex = 100 decimal)  
   
 Signal Path:  
-... 00 1e 56 ... / 1e= ->1->2->3-> / 5e= <-1<-2<-3<- / different?       
+...64 00 00 1e 56 ... / 1e= ->1->2->3-> / 5e= <-1<-2<-3<- / different?       
   
 Light:     
 ...00 64 xx 1e ... / 00=on 01=1sec ...0a=10sec etc.  
@@ -135,6 +140,7 @@ Tuner:
   
 ...1e 56 xx 0y... /Type Chromatic=00/Bassbx0=10 00/Bassbx1=10 01/Bassbx2= 10 02/Bassbx3= 10 03  
   
+  
 Looper:  
   
   
@@ -142,10 +148,33 @@ Looper:
 other answers:  
 f0 52 00 4f 00 00 f7 = ??? confirm / okay ???  
 f0 52 00 4f 20 00 f7 = ??? refused ???  
+f0 52 00 4f 00 0b f7 = ???  
 f0 52 00 4f 32 01 00 00 40 00 00 00 00 00 f7 = confirm saving patch to current position (G4(=40))  
 
   
-
+amidi -p hw:2,0,0 -S "F0 52 00 4F 01 F7"  
+f0 52 00 4f 00 0b f7  
+   
+amidi -p hw:2,0,0 -S "F0 52 00 4F 04 F7" (and 05)  
+f0 52 00 4f 00 00 f7  
+  
+amidi -p hw:2,0,0 -S "F0 52 00 4F 07 F7"  
+f0 52 00 4f 06 64 00 36 00 f7
+  
+amidi -p hw:2,0,0 -S "F0 52 00 4F 0E F7"  
+f0 52 00 4f 00 0b f7  
+  
+amidi -p hw:2,0,0 -S "F0 52 00 4F 16 F7"  
+f0 52 00 4f 17 45 00 00 00 00 f7  
+  
+amidi -p hw:2 -S "F0 52 00 4F 09 00 00 00 F7"
+f0 52 00 4f 08 00 00 00 36 00 50 19 1a 00 02 48 00 41 00 00 00 00 00 00 28 10 00 40 02 60 00 0c 0e 0c 08 0a 64 00 3f 22 40 04 00 50 00 0e 32 50 01 00 35 3c 64 02 00 00 0c 00 00 0c 4d 61 72 6b 42 6f 00 6f 73 74 20 00 16 3d 5b 25 09 f7  
+amidi -p hw:2 -S "F0 52 00 4F 08 00 00 00 36 00 50 19 1A 00 02 48 00 41 00 00 00 00 00 00 28 10 00 40 02 60 00 0C 0E 0C 08 0A 64 00 3F 22 40 04 00 50 00 0E 32 50 01 00 35 3C 64 02 00 00 0C 00 00 0C 4D 61 72 6B 42 6F 00 6F 73 74 20 00 16 3D 5B 25 09 F7"  
+f0 52 00 4f 00 00 f7  
+Compare it with other current patch / 29    
+  
+  
+  
 Change the preset:  
 -----------------------------------------------
 ... as Control Change Messages:  
@@ -253,7 +282,6 @@ Change the preset:
 | J7 | 61 | amidi -p hw:2,0,0 -S "C0 61" |
 | J8 | 62 | amidi -p hw:2,0,0 -S "C0 62" |
 | J9 | 63 | amidi -p hw:2,0,0 -S "C0 63" |
-
   
 ... or as SysEx Message:  
 amidi -p hw:2 -S "F0 52 00 4F 32 C0 xx F7"  
@@ -265,32 +293,30 @@ Turning-off left effect (Module0):
 amidi -p hw:2 -S "F0 52 00 4F 31 00 00 00 00 F7"  
 turning-on ...:            
 amidi -p hw:2 -S "F0 52 00 4F 31 00 00 01 00 F7"  
-
-
+  
 Turning-off middle effect (Module1):  
 amidi -p hw:2 -S "F0 52 00 4F 31 01 00 00 00 F7"  
 turning-on ...:            
 amidi -p hw:2 -S "F0 52 00 4F 31 01 00 01 00 F7"  
-
+  
 Turning-off right effect (Module2):  
 amidi -p hw:2 -S "F0 52 00 4F 31 02 00 00 00 F7"  
 turning-on ...:            
 amidi -p hw:2 -S "F0 52 00 4F 31 02 00 01 00 F7"  
-
-
-
+  
+  
 Change Preset directly:
 --------------------------------------------------
 (09 = Bit Crush)  
 Left (Module0):  
 amidi -p hw:2 -S "F0 52 00 4f 31 00 01 09 00 f7"  
-
+  
 Middle (Module1):  
 amidi -p hw:2 -S "F0 52 00 4f 31 01 01 09 00 f7"  
-
+  
 Right (Module2):  
 amidi -p hw:2 -S "F0 52 00 4f 31 02 01 09 00 f7"  
-
+  
 Sort it like in the firmware!      
    
 | Preset | Command | 
@@ -410,12 +436,11 @@ Sort it like in the firmware!
   
   
   
-
 Change Tempo:  
 --------------------------------------------------------------------
 x changes the value for 16 bpm, y for 1 bpm. If the value rise above 127, it counts z to 1 and xy change to zero.  
 amidi -p hw:2 -S "F0 52 00 4F 31 03 08 xy 0z F7"  
-
+  
 | BPM | Command | 
 | --- | --- |   
 | 40  | amidi -p hw:2 -S "F0 52 00 4F 31 03 08 00 00 F7" |  
@@ -430,6 +455,7 @@ amidi -p hw:2 -S "F0 52 00 4F 31 03 08 xy 0z F7"
 | 249 | amidi -p hw:2 -S "F0 52 00 4F 31 03 08 79 01 F7" |  
 | 250 | amidi -p hw:2 -S "F0 52 00 4F 31 03 08 7a 01 F7" |  
 | 250 | amidi -p hw:2 -S "F0 52 00 4F 31 03 08 00 10 F7" |  
+  
   
   
 Names:  
@@ -548,7 +574,7 @@ Example Chain 1 original to one step forward (right)..
   
   
   
-
+  
 The 32er line:  
 ---------------------------------------------------------------------
 Store the current preset to D9:   
@@ -581,11 +607,10 @@ amidi -p hw:2 -S "F0 52 00 4F 31 03 0C 17 00 F7"
 amidi -p hw:2 -S "f0 52 00 4f 31 03 xx yy 00 f7"  
 xx from 0C up to 1A / from 1B up to 2F is okay /  from 30 to ??? it will crash again.    
 yy = arbitrarily  
-
-
-
-
-
+  
+  
+  
+  
 # Appendix:  
 
 
