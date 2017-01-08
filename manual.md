@@ -1,6 +1,9 @@
-
-# Preliminary information  
   
+  
+Not complete yet... to be continued...  
+  
+  
+# Preliminary information  
   
   
 What is a ...? 
@@ -10,21 +13,22 @@ What is a ...?
 | Preset | The effect itself, integrated in the firmware.|  
 | Patch | The whole configuration of one signal chain, etc. you edited.|  
 | Bank | The whole storage of max. 100 patches. (A0-J9)|  
-
+  
   
 FYI: amidi -hw:2,0,0 can directed to other ports in other setups.  
   
 Upper case SysEx messages = transmit to device  
 Lower case SysEx messages = receive from device  
   
-
-Not complete yet... to be continued...  
+  
+  
+   
   
   
 ## Structure of a System Exclusive (SysEx) message:  
   
-e.g.  
-F0 52 00 4F 31 01 00 00 00 F7
+
+    F0 52 00 4F 31 01 00 00 00 F7
 
 | Preset | Command | 
 | --- | --- |  
@@ -42,112 +46,65 @@ F0 52 00 4F 31 01 00 00 00 F7
 # Dialogs with the device  
   
   
-
-(Un)Lock and requests:  
------------------------------------------------
   
-General request to identify devices (Who are you?):  
-amidi -p hw:2 -S "F0 7E 00 06 01 F7"  
-  Answer:  
-  f0 7e 00 06 02 52 4f 00  00 00 31 2e 32 30 f7   
+## (Un)Lock and requests:  
+
+  
+### General request to identify devices (Who are you?):  
+
+    amidi -p hw:2 -S "F0 7E 00 06 01 F7"  
+Answer:  
+f0 7e 00 06 02 52 4f 00  00 00 31 2e 32 30 f7   
 06 = General Information    
 02 = Identity Reply     
 52 = Manufacturer ID  
 4f = Model ID  
 31 2e 32 30 = 1.20   
   
-  
-Unlock device:  
-amidi -p hw:2 -S "F0 52 00 4F 50 F7"   
+    
+### Unlock device:  
+
+    amidi -p hw:2 -S "F0 52 00 4F 50 F7"   
 ...no answer.  
   
-  
-Lock device again:  
-amidi -p hw:2 -S "F0 52 00 4F 51 F7"  
+    
+    
+### Lock device again:  
+
+    amidi -p hw:2 -S "F0 52 00 4F 51 F7"  
 If the device is locked, the patch will be reset. Does not work for adjustments inside the totalmodus.  
 ...no answer.  
   
   
-Request current position in bank:  
-amidi -p hw:2 -S "F0 52 00 4F 33 F7"  
+### Request current position in bank:  
+
+    amidi -p hw:2 -S "F0 52 00 4F 33 F7"  
 Answer:  
 B0 00 00 <- ?CC: Bank MSB -Most Significant Byte?  
 B0 20 00 <- ?CC: Bank LSB -Least Significant Byte?      
 C0 2B  <- Bank E3    
   
   
-Request the current patch configuration:  
-amidi -p hw:2 -S "F0 52 00 4F 29 F7"  
+### Request the current patch configuration:  
+
+    amidi -p hw:2 -S "F0 52 00 4F 29 F7"  
 ... see appendix (2) for further information.  
     
   
-Request global configuration and ???:  
+### Request global configuration and ???:  
 (move it to appendix, when ready)  
-amidi -p hw:2 -S "F0 52 00 4F 2B F7"  
-Different answers:  
-f0 52 00 4f 2a 01 54 00 0f 58 00 00 10 00 01 00 19 00 f7  
-f0 52 00 4f 2a 10 21 00 1d 54 00 00 40 00 01 00 19 00 f7    
-f0 52 00 4f 2a 01 00 00 0a 5c 00 00 10 00 01 00 19 00 f7  
+
+    amidi -p hw:2 -S "F0 52 00 4F 2B F7"  
+... see appendix (2) for further information.  
+
+
   
   
   
-f0 52 00 4f 2a 00 64 00 1e 56 00 00 40 00 01 00 19 00 f7  
-  
-Battery:  
-...2a xx 64... / 00=Alkaline / 10=Ni-MH  
-  
-Level:  
-... 2a 00 xx 00... (64 hex = 100 decimal)  
-  
-Signal Path:  
-...64 00 00 1e 56 ... / 1e= ->1->2->3-> / 5e= <-1<-2<-3<- / different?       
-  
-Light:     
-...00 64 xx 1e ... / 00=on 01=1sec ...0a=10sec etc.  
-  
-Rec Gain:  
-...64 00 1e xx 00... / 0db=56 1db=57  
-  
-  
-Rhythmus Level
-...2a 0y 64 00 1e 56 00 00 xx 00... / 80=40(xx) / 81=44 / 82=48 /.../ 95=7c (max)  
-...2a 01 64 00 1e 56 00 00 00 00... / 96=00(xx)+01(0y)  
-...2a 01 64 00 1e 56 00 00 04 00... / 97  
-...2a 01 64 00 1e 56 00 00 10 00... / 100  
-  
-Rhythm Pattern:  
-...2a 0y 64 00 1e 56 00 x0 40 00... / x=00&y=00 = Guide / x=10&y=00 = 8Beat1 / x=up to 70   
-...2a 02 64 00 1e 56 00 30 40 00... / x=30&y=02 = Metal2  
-  
-  
-| BPM | Response | 
-| --- | --- |
-|  40 | f0 52 00 4f 2a 00 64 00 0a 56 00 00 40 00 01 00 19 00 f7 |  
-|  41 | f0 52 00 4f 2a 00 64 40 0a 56 00 00 40 00 01 00 19 00 f7 | 
-|  42 | f0 52 00 4f 2a 20 64 00 0a 56 00 00 40 00 01 00 19 00 f7 | 
-|  43 | f0 52 00 4f 2a 20 64 40 0a 56 00 00 40 00 01 00 19 00 f7 | 
-|  44 | f0 52 00 4f 2a 00 64 00 0b 56 00 00 40 00 01 00 19 00 f7 | 
-| ... |                                                          |
-| 127 | f0 52 00 4f 2a 20 64 40 1f 56 00 00 40 00 01 00 19 00 f7 | 
-| 128 | f0 52 00 4f 2a 00 64 00 20 56 00 00 40 00 01 00 19 00 f7 | 
-| 129 | f0 52 00 4f 2a 00 64 40 20 56 00 00 40 00 01 00 19 00 f7 | 
-| ... |                                                          |
-| 250 | f0 52 00 4f 2a 20 64 00 3e 56 00 00 40 00 01 00 19 00 f7 |  
-  
-  
-Tuner:  
-...2a 0y 64 00 1e xx 00... / 440Hz=56 / 441Hz=66 / 443Hz=06(xx)+08(0y)  
-  
-...1e 56 xx 0y... /Type Chromatic=00/Bassbx0=10 00/Bassbx1=10 01/Bassbx2= 10 02/Bassbx3= 10 03  
-  
-  
-Looper:  
-  
-  
-  
-other answers:  
-f0 52 00 4f 00 00 f7 = ??? confirm / okay ???  
+### other answers:  
+f0 52 00 4f 00 00 f7 = confirm / okay   
 f0 52 00 4f 20 00 f7 = ??? refused ???  
+f0 52 00 4f 00 0a f7 = ???   
 f0 52 00 4f 00 0b f7 = ???  
 f0 52 00 4f 32 01 00 00 40 00 00 00 00 00 f7 = confirm saving patch to current position (G4(=40))  
 
@@ -175,8 +132,10 @@ Compare it with other current patch / 29
   
   
   
-Change the preset:  
------------------------------------------------
+ 
+  
+## Change the preset:  
+  
 ... as Control Change Messages:  
 
 | Bank | CC | Command | 
@@ -284,11 +243,11 @@ Change the preset:
 | J9 | 63 | amidi -p hw:2,0,0 -S "C0 63" |
   
 ... or as SysEx Message:  
-amidi -p hw:2 -S "F0 52 00 4F 32 C0 xx F7"  
+amidi -p hw:2 -S "F0 52 00 4F Cx yy F7"  
 
 
-Stompbar:  
-------------------------------------------------- 
+## Stompbar:  
+
 Turning-off left effect (Module0):  
 amidi -p hw:2 -S "F0 52 00 4F 31 00 00 00 00 F7"  
 turning-on ...:            
@@ -305,8 +264,8 @@ turning-on ...:
 amidi -p hw:2 -S "F0 52 00 4F 31 02 00 01 00 F7"  
   
   
-Change Preset directly:
---------------------------------------------------
+## Change Preset directly:
+  
 (09 = Bit Crush)  
 Left (Module0):  
 amidi -p hw:2 -S "F0 52 00 4f 31 00 01 09 00 f7"  
@@ -436,7 +395,7 @@ Sort it like in the firmware!
   
   
   
-Change Tempo:  
+## Change Tempo:  
 --------------------------------------------------------------------
 x changes the value for 16 bpm, y for 1 bpm. If the value rise above 127, it counts z to 1 and xy change to zero.  
 amidi -p hw:2 -S "F0 52 00 4F 31 03 08 xy 0z F7"  
@@ -458,7 +417,7 @@ amidi -p hw:2 -S "F0 52 00 4F 31 03 08 xy 0z F7"
   
   
   
-Names:  
+## Names:  
 ---------------------------------------------------
 .. = F0 52 00 4F 31 04 xx yz 00 F7  
 xx = Ten digits / 0-9  
@@ -513,7 +472,7 @@ z =  F0 52 00 4F 31 04 09 7A 00 F7
 Revise and translate below this!!!  
 -----------------------------------------
 
-Knobs:  
+## Knobs:  
 -----------------------------------------
 In short:    
 F0 52 00 4F 31 00 02 05 00 F7  
@@ -558,24 +517,34 @@ x
 
 
 
-Global:  
+## Global:  
 ----------------------------------------------------------
 Flip signal path forward/backward (0x = 0 oder 1):    
 F0 52 00 4F 31 03 09 0x 00 F7  
 
 
-Im Total-Modus 
+## Im Total-Modus 
 ---------------------------------------------------------- 
-Level: F0 52 00 4F 31 03 02 xx 00 F7  
+
+| Option | Command | 
+| --- | --- | 
+| Level | F0 52 00 4F 31 03 02 xx 00 F7 |  
+|Balance | F0 52 00 4F 31 03 0A xx 00 F7 |
+|        |                               |
+|CTRL SW | F0 52 00 4F 31 03 06 04 00 F7 |
+| Unknown | ?F0 52 00 4F 31 03 07 00 00 F7? |   
+  
   
 
 change the order of the presets ???:  
-Example Chain 1 original to one step forward (right)..   
+  
+  
+   
   
   
   
   
-The 32er line:  
+## The 32er line:  
 ---------------------------------------------------------------------
 Store the current preset to D9:   
 amidi -p hw:2 -S "F0 52 00 4F 32 01 00 00 27 00 00 00 00 00 F7"  
@@ -592,7 +561,7 @@ amidi -p hw:2 -S "C0 40"
   
   
   
-Midi footpedal:
+## Midi footpedal:
 ---------------------------------------------------------------------
 If you disable the lock, you get the value of a footpedal per SysEx.  
 f0 52 00 4f xx 1a f7  
@@ -600,15 +569,35 @@ f0 52 00 4f xx 1a f7
   
  
   
-SysEx of Death:  
+## SysEx of Death:  
 --------------------------------------------------------------------- 
 If you send these messages, the ZFXB3 will crash, and have to reboot. Be careful!  
 amidi -p hw:2 -S "F0 52 00 4F 31 03 0C 17 00 F7"  
 amidi -p hw:2 -S "f0 52 00 4f 31 03 xx yy 00 f7"  
-xx from 0C up to 1A / from 1B up to 2F is okay /  from 30 to ??? it will crash again.    
+xx from 0C up to 1A / 1B okay, 1C & 1E not, 1F okay and then up to 2F is okay /  from 30 to ??? 7F it will crash again.    
 yy = arbitrarily  
   
+| xx | Result | 
+| --- | --- | 
+| 0B | okay |  
+| 0C | crash |  
+| .. | crash |
+| 1A | crash |
+| 1B | okay |
+| 1C | crash |
+| 1E | crash |
+| 1F | okay |
+| 20 | crash |
+| 21 | okay |
+| 22 | okay |
+| 23 | crash |
+| 24 | crash |
+| 25 | okay |
+| 26 | crash |
+| 27 | crash |
+| .. | crash |
   
+
   
   
 # Appendix:  
@@ -878,6 +867,86 @@ The associated XML-file looks like that:
  
 ```
  
+  
+ 
+ 
+  
+## (3) Request the global configuration :  
+  
+  
+amidi -p hw:2 -S "F0 52 00 4F 2B F7"  
+  
+  
+Different answers:  
+f0 52 00 4f 2a 01 54 00 0f 58 00 00 10 00 01 00 19 00 f7  
+f0 52 00 4f 2a 10 21 00 1d 54 00 00 40 00 01 00 19 00 f7    
+f0 52 00 4f 2a 01 00 00 0a 5c 00 00 10 00 01 00 19 00 f7  
+f0 52 00 4f 2a 00 64 40 21 51 00 60 48 00 00 04 19 00 f7   
+  
+  
+    
+for this case:  
+f0 52 00 4f 2a 00 64 00 1e 56 00 00 40 00 01 00 19 00 f7  
+  
+Battery:  
+...2a xx 64... / 00=Alkaline / 10=Ni-MH  
+  
+Level:  
+... 2a 00 xx 00... (64 hex = 100 decimal)  
+  
+Signal Path:  
+...64 00 00 1e 56 ... / 1e= ->1->2->3-> / 5e= <-1<-2<-3<- / different?       
+  
+Light:     
+...00 64 xx 1e ... / 00=on 01=1sec ...0a=10sec etc.  
+  
+Rec Gain:  
+...64 00 1e xx 00... / 0db=56 1db=57  
+  
+  
+Rhythmus Level
+...2a 0y 64 00 1e 56 00 00 xx 00... / 80=40(xx) / 81=44 / 82=48 /.../ 95=7c (max)  
+...2a 01 64 00 1e 56 00 00 00 00... / 96=00(xx)+01(0y)  
+...2a 01 64 00 1e 56 00 00 04 00... / 97  
+...2a 01 64 00 1e 56 00 00 10 00... / 100  
+  
+Rhythm Pattern:  
+...2a 0y 64 00 1e 56 00 x0 40 00... / x=00&y=00 = Guide / x=10&y=00 = 8Beat1 / x=up to 70   
+...2a 02 64 00 1e 56 00 30 40 00... / x=30&y=02 = Metal2  
+  
+  
+| BPM | Response | 
+| --- | --- |
+|  40 | f0 52 00 4f 2a 00 64 00 0a 56 00 00 40 00 01 00 19 00 f7 |  
+|  41 | f0 52 00 4f 2a 00 64 40 0a 56 00 00 40 00 01 00 19 00 f7 | 
+|  42 | f0 52 00 4f 2a 20 64 00 0a 56 00 00 40 00 01 00 19 00 f7 | 
+|  43 | f0 52 00 4f 2a 20 64 40 0a 56 00 00 40 00 01 00 19 00 f7 | 
+|  44 | f0 52 00 4f 2a 00 64 00 0b 56 00 00 40 00 01 00 19 00 f7 | 
+| ... |                                                          |
+| 127 | f0 52 00 4f 2a 20 64 40 1f 56 00 00 40 00 01 00 19 00 f7 | 
+| 128 | f0 52 00 4f 2a 00 64 00 20 56 00 00 40 00 01 00 19 00 f7 | 
+| 129 | f0 52 00 4f 2a 00 64 40 20 56 00 00 40 00 01 00 19 00 f7 | 
+| ... |                                                          |
+| 250 | f0 52 00 4f 2a 20 64 00 3e 56 00 00 40 00 01 00 19 00 f7 |  
+  
+  
+Tuner:  
+...2a 0y 64 00 1e xx 00... / 440Hz=56 / 441Hz=66 / 443Hz=06(xx)+08(0y)  
+  
+...1e 56 xx 0y... /Type Chromatic=00/Bassbx0=10 00/Bassbx1=10 01/Bassbx2= 10 02/Bassbx3= 10 03  
+  
+  
+Looper:  
+...40 00 01 00 19 00... / Level / in this case 100 
+...40 00 xx yy zz 00...   
+  
+...40 00 01 0x 19 00... / Undo / 00=off 04=on  
+  
+...40 00 01 xx 19 00... / Stop Mode / Stop=00 Finish=08 FadeOut=10
+  
+Rhytmus Level (s.o)  
+
+
 
 
 
