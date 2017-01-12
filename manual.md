@@ -39,8 +39,7 @@ Lower case SysEx messages = receive from device
 | 52 | Manufacturer identifier, in this case Zoom® |  
 | 00 | Device ID |  
 | 4F | Model identifier, in this case B3 |  
-| .. | the proper message |  
-| 00 | ?Checksum if necessary? |  
+| .. | the proper message |    
 | F7 | SysEx Endbyte |   
   
   
@@ -66,7 +65,7 @@ Lower case SysEx messages = receive from device
   
     
 ### Unlock device:  
-The device is locked for SysEx by default. It accept only Control Change and general messages. Open Sesame:  
+The device is locked for SysEx messages by default. It accept only control hhange and general messages. Open Sesame!  
   
     amidi -p hw:2,0,0 -S "F0 52 00 4F 50 F7"   
 ...no answer.  
@@ -76,11 +75,11 @@ The device is locked for SysEx by default. It accept only Control Change and gen
 ### Lock device again:  
 
     amidi -p hw:2,0,0 -S "F0 52 00 4F 51 F7"  
-If the device is locked, the patch will be reset. Does not work for adjustments inside the totalmodus.  
+If the device is locked, the patch will be reset. Does not work for adjustments for the totalmodus.  
 ...no answer.  
   
   
-### Request current position in bank:  
+### Request current location in bank:  
 
     amidi -p hw:2,0,0 -S "F0 52 00 4F 33 F7"  
 
@@ -92,16 +91,16 @@ If the device is locked, the patch will be reset. Does not work for adjustments 
 ### Request the current patch configuration:  
 
     amidi -p hw:2,0,0 -S "F0 52 00 4F 29 F7"  
-... see appendix (2) for further information.  
+... (68 byte) see appendix (2) for further information.  
     
 
-### Request patches inclusive Locator (CC) silently:  
+### Request patches configuration inclusive location info (xx=CC) silently:  
   
     amidi -p hw:2,0,0 -S "F0 52 00 4F 09 00 00 xx F7"  
-... see appendix (x) for further information.
+... (78 byte) see appendix (x) for further information.
 
 
-### Request global configuration and ???:    
+### Request global, tuner, looper, ??? configuration:    
 
     amidi -p hw:2,0,0 -S "F0 52 00 4F 2B F7"  
 ... see appendix (3) for further information.  
@@ -253,38 +252,38 @@ Compare it with other current patch / 29
 | J9 | 63 | amidi -p hw:2,0,0 -S "C0 63" |
   
 ... or as SysEx Message:  
-amidi -p hw:2,0,0 -S "F0 52 00 4F C0 xx F7"  
+amidi -p hw:2,0,0 -S "F0 52 00 4F Cn xx F7"  
 
 
 ## Stompbar:  
 
-Turning-off left effect (Module0):  
+Turn off left effect (Module0):  
 amidi -p hw:2,0,0 -S "F0 52 00 4F 31 00 00 00 00 F7"  
-turning-on ...:            
+turn on ...:            
 amidi -p hw:2,0,0 -S "F0 52 00 4F 31 00 00 01 00 F7"  
   
-Turning-off middle effect (Module1):  
+Turn off middle effect (Module1):  
 amidi -p hw:2,0,0 -S "F0 52 00 4F 31 01 00 00 00 F7"  
-turning-on ...:            
+turn on ...:            
 amidi -p hw:2,0,0 -S "F0 52 00 4F 31 01 00 01 00 F7"  
   
-Turning-off right effect (Module2):  
+Turn off right effect (Module2):  
 amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 00 00 00 F7"  
-turning-on ...:            
+turn on ...:            
 amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 00 01 00 F7"  
   
   
 ## Change Preset directly:
   
-(09 = Bit Crush)  
-Left (Module0):  
-amidi -p hw:2,0,0 -S "F0 52 00 4f 31 00 01 09 00 f7"  
+    (09 = Bit Crush)  
+    Left (Module0):  
+    amidi -p hw:2,0,0 -S "F0 52 00 4f 31 00 01 09 00 f7"  
   
-Middle (Module1):  
-amidi -p hw:2,0,0 -S "F0 52 00 4f 31 01 01 09 00 f7"  
+    Middle (Module1):  
+    amidi -p hw:2,0,0 -S "F0 52 00 4f 31 01 01 09 00 f7"  
   
-Right (Module2):  
-amidi -p hw:2,0,0 -S "F0 52 00 4f 31 02 01 09 00 f7"  
+    Right (Module2):  
+    amidi -p hw:2,0,0 -S "F0 52 00 4f 31 02 01 09 00 f7"  
   
 Sort it like in the firmware!      
    
@@ -416,20 +415,20 @@ amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 xy 0z F7"
 | 40  | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 01 00 F7" |  
 | 100 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 64 00 F7" |  
 | 120 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 78 00 F7" |  
+| 127 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 7F 00 F7" |  
 | 128 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 00 01 F7" |  
 | 129 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 01 01 F7" |  
 | 152 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 18 01 F7" |    
 | 153 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 19 01 F7" |  
 | 168 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 28 01 F7" |  
 | 249 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 79 01 F7" |  
-| 250 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 7a 01 F7" |  
-| 250 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 00 10 F7" |  
+| 250 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 7a 01 F7" |   
   
   
   
 ## Names:  
   
-.. = F0 52 00 4F 31 04 xx yz 00 F7  
+    F0 52 00 4F 31 04 xx yz 00 F7  
 xx = Ten digits / 0-9  
 yz = Character   
 
