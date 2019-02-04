@@ -63,7 +63,7 @@ do
             ;;
         v)
             echo "0.00.004 alpha" >&2
-            exit 1
+            exit
             ;;
         *)
             usage
