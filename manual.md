@@ -44,6 +44,11 @@ Lower case SysEx messages = receive from device
   
   
   
+## Factory reset:  
+  
+Press STORE/SWAP and start the device.  
+  
+  
 
 # Dialogs with the device  
   
