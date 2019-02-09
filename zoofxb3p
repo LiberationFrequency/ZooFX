@@ -2,7 +2,7 @@
 
 ## Proof of concept, how to read in a .b3p-file and transmit it to the ZFXB3. Not ready yet.
 ## e.g.
-## ./zoofxb3p.sh /path/to/filename.b3p 
+## ./zoofxb3p /path/to/filename.b3p 
 
 # Script handling:
 # Protect scripts (errexit -e, nounset -u, noglob -f)
@@ -26,59 +26,69 @@ file=$(lastarg $# "$@")
 
 # Parse arguments
 usage() {
-    echo "Usage: $0 [-h] [-v] [-b bank]  /path/to/file.b3p"
-    echo "  -b  Add on. Select bank. (A0 - J9)" Need capital letters. Works only from A0 to F9 at the moment. # invalid character -
-    echo "  -f  Specify a .b3p-file and transmit config to device."
-    echo "  -h  Help. Display this message and quit."
-    echo "  -p  Add on. Flip signal chain path forward/backward. (0 / 1)"
-    echo "  -r  Add on. Reset changes from the preset and quit. Works from time to time." #(?Not inside Total-/Globalmodus)
-#    echo "  -t  *Not implemented yet* Add on. Define Tempo."
-    echo "  -v  Version. Print version number and quit."
-    exit
+  printf "%s\n" "Usage: $0 [-h] [-v] [-b bank]  /path/to/file.b3p"
+  printf "%s\n" "  -b  Add on. Select bank (A0 - J9). Need capital letters. Works only from A0 to F9 at the moment."
+  printf "%s\n" "  -f  Force transmit patch to device, even if versions not matching."
+  printf "%s\n" "  -h  Help. Display this message and quit."
+  printf "%s\n" "  -p  Specify a hardware port, e.g. hw:2,0,0."
+  printf "%s\n" "  -r  Add on. Reset changes from the preset and quit. Works from time to time." #(?Not inside Total-/Globalmodus)
+  printf "%s\n" "  -s  Add on. Flip signal chain path forward/backward. (0 / 1)"
+#  printf "%s\n" "  -t  *Not implemented yet* Add on. Define Tempo."
+  printf "%s\n" "  -v  Version. Print version number and quit."
+  exit
 }
 
-# device hardware port
-port=$(amidi -l | tail -n 1 | cut -d " " -f 3)
-if [ -z "$port" ]; then
-  printf "%s\n" "Failed to receive the hardware port."
-fi
-
 bank=""
-optspec="b:hvrfp:"
+optspec="p:b:f:hvrs:"
 while getopts "$optspec" optchar
 do
     case "${optchar}" in
+        'p')  
+            port=${OPTARG}
+            ;;
         'b')
             bank="$OPTARG"
+            set +u
+            if [ -z "$port" ]; then
+              port=$(amidi -l | tail -n 1 | cut -d " " -f 3)
+            fi
+            set -u
             printf "%s\n" "$bank"
-	    bankd=$(printf "%s\n" "ibase=16; $bank" | bc)
+            # not working in dash,yash
+            #bankd=$(printf "%d\n" "$((16#$bank))")
+            bankd=$(printf "%s\n" "ibase=16; $bank" | bc)
             printf "%s\n" "bankd: $bankd" 
-            banks=$(printf "%s\n" "scale=0; $bankd-160" | bc)
+            banks=$((bankd - 160))
             printf "%s\n" "banks: $banks"
-            varc=$(printf "%s\n" "obase=16; $banks" | bc)
+            varc=$(printf "%X\n" "$banks")
             printf "%s\n" "varc: $varc"
-	    varh=$(printf "%s\n" "obase=16; $varc" | bc)
-	    printf "%s\n" "varh: $varh"
-	    amidi -p "$port" -S "C0 $varh"
-#	    exit 1
+            varh=$(printf "%X\n" "$varc")
+            printf "%s\n" "varh: $varh"
+	    amidi -p "$port" -S "C0 $varh" > /dev/null
 	    ;;
-#        'f')
-#            file=$"{OPTARG}"
-#            ;;
+        'f')
+            force=${OPTARG}
+            force1=$(printf "%s\n" "something")
+            ;;
         'h')
             usage
-            ;;
-        'p')  
-            path=${OPTARG}
-	    amidi -p "$port" -S "F0 52 00 4F 50 F7" && amidi -p "$port" -S "F0 52 00 4F 31 03 09 $path 00 F7" && amidi -p "$port" -S "F0 52 00 4F 51 F7" >&2
-#            exit
             ;;
         'r')
             amidi -p "$port" -S "F0 52 00 4F 51 F7" >&2
             exit
             ;;
+       's')
+            flip=${OPTARG}
+            set +u
+            if [ -z "$port" ]; then
+              port=$(amidi -l | tail -n 1 | cut -d " " -f 3) 
+            fi
+            set -u
+	    amidi -p "$port" -S "F0 52 00 4F 50 F7" && amidi -p "$port" -S "F0 52 00 4F 31 03 09 $flip 00 F7" \
+            && amidi -p "$port" -S "F0 52 00 4F 51 F7" >&2
+            ;;
         'v')
-            echo "0.00.005 alpha"
+            echo "0.00.006 alpha"
             exit
             ;;
         *)
@@ -86,6 +96,12 @@ do
             ;;
     esac
 done
+
+set +u
+if [ -z "$port" ]; then
+  port=$(amidi -l | tail -n 1 | cut -d " " -f 3) 
+fi
+set -u
 
 # product
 prod=$(xml sel -t -v "(PatchData/Product)" -n "$file")
@@ -105,40 +121,39 @@ case "$prod" in
 esac
 #printf "%s\n" "$mod"
 
-
+set +u
+if [ -z "$force1" ]; then
 ## Identify device
-id=$(amidi -p hw:2,0,0 -S "F0 7E 00 06 01 F7" -d -t 0.4 | tail -n 1)
-echo "id: $id"
+id=$(amidi -p "$port" -S "F0 7E 00 06 01 F7" -d -t 0.4 | tail -n 1)
+printf "%s\n" "id: $id"
 
 # System version
 verh=$(printf "%s" "$id" | cut -c 31-41)
-echo "verh: $verh"
-vers=$(for c in $(printf "%s" "$verh"); do printf "\x$c"; done)
-echo "vers: $vers"
+printf "%s\n" "verh: $verh"
+# Not working in dash, yash
+vers=$(for c in $(printf "%s\n" "$verh"); do printf "\x$c"; done)
+printf "%s\n" "vers: $vers"
 
 # Patch version
 pver=$(xml sel -t -v "(PatchData/Version)" -n "$file")
-echo "pver: $pver"
+printf "%s\n" "pver: $pver"
 
 # Compare Version
 if [ "$vers" = "$pver" ]; then
   printf "%s\n" "Same version."
 elif [ "$vers" != "$pver" ]; then
   printf "%s\n" "The versions does not match. To prevent harm and damages it will not be send to the device."
-  printf "%s\n" "It could also work, try changing the patch to <Version>$vers</Version> manually."
-  printf "%s\n" "There is no force option available at the moment."
+  printf "%s\n" "It could also work, try passing -f by command line or changing the patch to <Version>$vers</Version> manually."
+  printf "%s\n" "It is known that the version check not working in dash and yash."
   exit 10
 fi
+
+fi
+set -u
 
 # Unlock device
 printf "%s\n" "Open Sesame!"
 amidi -p "$port" -S "F0 52 00 $mod 50 F7" -i 0.2
-
-####################
-#flip=$(echo "$6")
-#printf "%s\n" $flip
-#amidi -p "$port" -S "F0 52 00 $mod 31 03 09 $flip 00 F7" -i 0.2
-####################
 
 # Patchname
 pname=$(xml sel -t -v "(PatchData/Name)" -n "$file")
@@ -331,43 +346,43 @@ m0p0=$(xml sel -t -v "(PatchData/Module0/Prm0)" -n "$file")
 amidi -p "$port" -S "f0 52 00 $mod 31 00 00 $m0p0 00 f7" -i 0.2
 
 m0p1=$(xml sel -t -v "(PatchData/Module0/Prm1)" -n "$file")
-m0p1h=$(echo "obase=16; $m0p1" | bc)
+m0p1h=$(printf "%X\n" "$m0p1")
 amidi -p "$port" -S "f0 52 00 $mod 31 00 01 $m0p1h 00 f7" -i 0.2
 
 m0p2=$(xml sel -t -v "(PatchData/Module0/Prm2)" -n "$file")
-m0p2h=$(echo "obase=16; $m0p2" | bc)
+m0p2h=$(printf "%X\n" "$m0p2")
 amidi -p "$port" -S "F0 52 00 $mod 31 00 02 $m0p2h 00 F7" -i 0.2
 
 m0p3=$(xml sel -t -v "(PatchData/Module0/Prm3)" -n "$file")
-m0p3h=$(echo "obase=16; $m0p3" | bc)
+m0p3h=$(printf "%X\n" "$m0p3")
 amidi -p "$port" -S "F0 52 00 $mod 31 00 03 $m0p3h 00 F7" -i 0.2
 
 m0p4=$(xml sel -t -v "(PatchData/Module0/Prm4)" -n "$file")
-m0p4h=$(echo "obase=16; $m0p4" | bc)
+m0p4h=$(printf "%X\n" "$m0p4")
 amidi -p "$port" -S "F0 52 00 $mod 31 00 04 $m0p4h 00 F7" -i 0.2
 
 m0p5=$(xml sel -t -v "(PatchData/Module0/Prm5)" -n "$file")
-m0p5h=$(echo "obase=16; $m0p5" | bc)
+m0p5h=$(printf "%X\n" "$m0p5")
 amidi -p "$port" -S "F0 52 00 $mod 31 00 05 $m0p5h 00 F7" -i 0.2
 
 m0p6=$(xml sel -t -v "(PatchData/Module0/Prm6)" -n "$file")
-m0p6h=$(echo "obase=16; $m0p6" | bc)
+m0p6h=$(printf "%X\n" "$m0p6")
 amidi -p "$port" -S "F0 52 00 $mod 31 00 06 $m0p6h 00 F7" -i 0.2
 
 m0p7=$(xml sel -t -v "(PatchData/Module0/Prm7)" -n "$file")
-m0p7h=$(echo "obase=16; $m0p7" | bc)
+m0p7h=$(printf "%X\n" "$m0p7")
 amidi -p "$port" -S "F0 52 00 $mod 31 00 07 $m0p7h 00 F7" -i 0.2
 
 m0p8=$(xml sel -t -v "(PatchData/Module0/Prm8)" -n "$file")
-m0p8h=$(echo "obase=16; $m0p8" | bc)
+m0p8h=$(printf "%X\n" "$m0p8")
 amidi -p "$port" -S "F0 52 00 $mod 31 00 08 $m0p8h 00 F7" -i 0.2
 
 m0p9=$(xml sel -t -v "(PatchData/Module0/Prm9)" -n "$file")
-m0p9h=$(echo "obase=16; $m0p9" | bc)
+m0p9h=$(printf "%X\n" "$m0p9")
 amidi -p "$port" -S "F0 52 00 $mod 31 00 09 $m0p9h 00 F7" -i 0.2
 
 m0p10=$(xml sel -t -v "(PatchData/Module0/Prm10)" -n "$file")
-m0p10h=$(echo "obase=16; $m0p10" | bc)
+m0p10h=$(printf "%X\n" "$m0p10")
 amidi -p "$port" -S "F0 52 00 $mod 31 00 0A $m0p10h 00 F7" -i 0.2
 
 
@@ -376,43 +391,43 @@ m1p0=$(xml sel -t -v "(PatchData/Module1/Prm0)" -n "$file")
 amidi -p "$port" -S "F0 52 00 $mod 31 01 00 $m1p0 00 F7" -i 0.2
 
 m1p1=$(xml sel -t -v "(PatchData/Module1/Prm1)" -n "$file")
-m1p1h=$(echo "obase=16; $m1p1" | bc)
+m1p1h=$(printf "%X\n" "$m1p1")
 amidi -p "$port" -S "f0 52 00 $mod 31 01 01 $m1p1h 00 f7" -i 0.2
 
 m1p2=$(xml sel -t -v "(PatchData/Module1/Prm2)" -n "$file")
-m1p2h=$(echo "obase=16; $m1p2" | bc)
+m1p2h=$(printf "%X\n" "$m1p2")
 amidi -p "$port" -S "F0 52 00 $mod 31 01 02 $m1p2h 00 F7" -i 0.2
 
 m1p3=$(xml sel -t -v "(PatchData/Module1/Prm3)" -n "$file")
-m1p3h=$(echo "obase=16; $m1p3" | bc)
+m1p3h=$(printf "%X\n" "$m1p3")
 amidi -p "$port" -S "F0 52 00 $mod 31 01 03 $m1p3h 00 F7" -i 0.2
 
 m1p4=$(xml sel -t -v "(PatchData/Module1/Prm4)" -n "$file")
-m1p4h=$(echo "obase=16; $m1p4" | bc)
+m1p4h=$(printf "%X\n" "$m1p4")
 amidi -p "$port" -S "F0 52 00 $mod 31 01 04 $m1p4h 00 F7" -i 0.2
 
 m1p5=$(xml sel -t -v "(PatchData/Module1/Prm5)" -n "$file")
-m1p5h=$(echo "obase=16; $m1p5" | bc)
+m1p5h=$(printf "%X\n" "$m1p5")
 amidi -p "$port" -S "F0 52 00 $mod 31 01 05 $m1p5h 00 F7" -i 0.2
 
 m1p6=$(xml sel -t -v "(PatchData/Module1/Prm6)" -n "$file")
-m1p6h=$(echo "obase=16; $m1p6" | bc)
+m1p6h=$(printf "%X\n" "$m1p6")
 amidi -p "$port" -S "F0 52 00 $mod 31 01 06 $m1p6h 00 F7" -i 0.2
 
 m1p7=$(xml sel -t -v "(PatchData/Module1/Prm7)" -n "$file")
-m1p7h=$(echo "obase=16; $m1p7" | bc)
+m1p7h=$(printf "%X\n" "$m1p7")
 amidi -p "$port" -S "F0 52 00 $mod 31 01 07 $m1p7h 00 F7" -i 0.2
 
 m1p8=$(xml sel -t -v "(PatchData/Module1/Prm8)" -n "$file")
-m1p8h=$(echo "obase=16; $m1p8" | bc)
+m1p8h=$(printf "%X\n" "$m1p8")
 amidi -p "$port" -S "F0 52 00 $mod 31 01 08 $m1p8h 00 F7" -i 0.2
 
 m1p9=$(xml sel -t -v "(PatchData/Module1/Prm9)" -n "$file")
-m1p9h=$(echo "obase=16; $m1p9" | bc)
+m1p9h=$(printf "%X\n" "$m1p9")
 amidi -p "$port" -S "F0 52 00 $mod 31 01 09 $m1p9h 00 F7" -i 0.2
 
 m1p10=$(xml sel -t -v "(PatchData/Module1/Prm10)" -n "$file")
-m1p10h=$(echo "obase=16; $m1p10" | bc)
+m1p10h=$(printf "%X\n" "$m1p10")
 amidi -p "$port" -S "F0 52 00 $mod 31 01 0A $m1p10h 00 F7" -i 0.2
 
 
@@ -421,59 +436,59 @@ m2p0=$(xml sel -t -v "(PatchData/Module2/Prm0)" -n "$file")
 amidi -p "$port" -S "f0 52 00 $mod 31 02 00 $m2p0 00 f7" -i 0.2
 
 m2p1=$(xml sel -t -v "(PatchData/Module2/Prm1)" -n "$file")
-m2p1h=$(echo "obase=16; $m2p1" | bc)
+m2p1h=$(printf "%X\n" "$m2p1")
 amidi -p "$port" -S "f0 52 00 $mod 31 02 01 $m2p1h 00 f7" -i 0.2
 
 m2p2=$(xml sel -t -v "(PatchData/Module2/Prm2)" -n "$file")
-m2p2h=$(echo "obase=16; $m2p2" | bc)
+m2p2h=$(printf "%X\n" "$m2p2")
 amidi -p "$port" -S "F0 52 00 $mod 31 02 02 $m2p2h 00 F7" -i 0.2
 
 m2p3=$(xml sel -t -v "(PatchData/Module2/Prm3)" -n "$file")
-m2p3h=$(echo "obase=16; $m2p3" | bc)
+m2p3h=$(printf "%X\n" "$m2p3")
 amidi -p "$port" -S "F0 52 00 $mod 31 02 03 $m2p3h 00 F7" -i 0.2
 
 m2p4=$(xml sel -t -v "(PatchData/Module2/Prm4)" -n "$file")
-m2p4h=$(echo "obase=16; $m2p4" | bc)
+m2p4h=$(printf "%X\n" "$m2p4")
 amidi -p "$port" -S "F0 52 00 $mod 31 02 04 $m2p4h 00 F7" -i 0.2
 
 m2p5=$(xml sel -t -v "(PatchData/Module2/Prm5)" -n "$file")
-m2p5h=$(echo "obase=16; $m2p5" | bc)
+m2p5h=$(printf "%X\n" "$m2p5")
 amidi -p "$port" -S "F0 52 00 $mod 31 02 05 $m2p5h 00 F7" -i 0.2
 
 m2p6=$(xml sel -t -v "(PatchData/Module2/Prm6)" -n "$file")
-m2p6h=$(echo "obase=16; $m2p6" | bc)
+m2p6h=$(printf "%X\n" "$m2p6")
 amidi -p "$port" -S "F0 52 00 $mod 31 02 06 $m2p6h 00 F7" -i 0.2
 
 m2p7=$(xml sel -t -v "(PatchData/Module2/Prm7)" -n "$file")
-m2p7h=$(echo "obase=16; $m2p7" | bc)
+m2p7h=$(printf "%X\n" "$m2p7")
 amidi -p "$port" -S "F0 52 00 $mod 31 02 07 $m2p7h 00 F7" -i 0.2
 
 m2p8=$(xml sel -t -v "(PatchData/Module2/Prm8)" -n "$file")
-m2p8h=$(echo "obase=16; $m2p8" | bc)
+m2p8h=$(printf "%X\n" "$m2p8")
 amidi -p "$port" -S "F0 52 00 $mod 31 02 08 $m2p8h 00 F7" -i 0.2
 
 m2p9=$(xml sel -t -v "(PatchData/Module2/Prm9)" -n "$file")
-m2p9h=$(echo "obase=16; $m2p9" | bc)
+m2p9h=$(printf "%X\n" "$m2p9")
 amidi -p "$port" -S "F0 52 00 $mod 31 02 09 $m2p9h 00 F7" -i 0.2
 
 m2p10=$(xml sel -t -v "(PatchData/Module2/Prm10)" -n "$file")
-m2p10h=$(echo "obase=16; $m2p10" | bc)
+m2p10h=$(printf "%X\n" "$m2p10")
 amidi -p "$port" -S "F0 52 00 $mod 31 02 0A $m2p10h 00 F7" -i 0.2
 
 
 # Module3 - Total modus adjustments
 m3p0=$(xml sel -t -v "(PatchData/Module3/Prm0)" -n "$file")
-m3p0h=$(echo "obase=16; $m3p0" | bc)
+m3p0h=$(printf "%X\n" "$m3p0")
 amidi -p "$port" -S "F0 52 00 $mod 31 03 02 $m3p0h 00 F7" -i 0.2
 
 ## CTRL SW(1) assign /0=no/1=FX1/2=FX2/3=FX3/4=TapTempo/5=Bypass/Mute
 m3p1=$(xml sel -t -v "(PatchData/Module3/Prm1)" -n "$file")
-#m3p1h=$(echo "obase=16; $m3p1" | bc)
+#m3p1h=$(printf "%X\n" "$m3p1")
 amidi -p "$port" -S "F0 52 00 $mod 31 03 06 $m3p1 00 F7" -i 0.2
 
 ## CTRL SW(2) assign - if a preset (m3p1) has more than one Option
 m3p2=$(xml sel -t -v "(PatchData/Module3/Prm2)" -n "$file")
-#m3p2h=$(echo "obase=16; $m3p2" | bc)
+#m3p2h=$(printf "%X\n" "$m3p2")
 amidi -p "$port" -S "F0 52 00 $mod 31 03 07 $m3p2 00 F7" -i 0.2
 
 ## CTRL PDL DEST
@@ -481,41 +496,41 @@ m3p3=$(xml sel -t -v "(PatchData/Module3/Prm3)" -n "$file")
 amidi -p "$port" -S "F0 52 00 $mod 31 03 03 00 $m3p3 F7" -i 0.2
 																	        
 m3p4=$(xml sel -t -v "(PatchData/Module3/Prm4)" -n "$file")
-m3p4h=$(echo "obase=16; $m3p4" | bc)
+m3p4h=$(printf "%X\n" "$m3p4")
 amidi -p "$port" -S "F0 52 00 $mod 31 03 04 $m3p4h 00 F7" -i 0.2
 
 m3p5=$(xml sel -t -v "(PatchData/Module3/Prm5)" -n "$file")
-m3p5h=$(echo "obase=16; $m3p5" | bc)
+m3p5h=$(printf "%X\n" "$m3p5")
 amidi -p "$port" -S "F0 52 00 $mod 31 03 05 $m3p5h 00 F7" -i 0.2
 
 #m3p6=$(xml sel -t -v "(PatchData/Module3/Prm6)" -n "$file")
-#m3p6h=$(echo "obase=16; $m3p6" | bc)
+#m3p6h=$(printf "%X\n" "$m3p6")
 #amidi -p "$port" -S "F0 52 00 $mod 31 03 06 $m3p6h 00 F7" -i 0.2
 
 m3p7=$(xml sel -t -v "(PatchData/Module3/Prm7)" -n "$file")
-m3p7h=$(echo "obase=16; $m3p7" | bc)
+m3p7h=$(printf "%X\n" "$m3p7")
 amidi -p "$port" -S "F0 52 00 $mod 31 03 0A $m3p7h 00 F7" -i 0.2
 
 #m3p8=$(xml sel -t -v "(PatchData/Module3/Prm8)" -n "$file")
-#m3p8h=$(echo "obase=16; $m3p8" | bc)
+#m3p8h=$(printf "%X\n" "$m3p8")
 #amidi -p "$port" -S "F0 52 00 $mod 31 03 08 $m3p8h 00 F7" -i 0.2
 
 #m3p9=$(xml sel -t -v "(PatchData/Module3/Prm9)" -n "$file")
-#m3p9h=$(echo "obase=16; $m3p9" | bc)
+#m3p9h=$(printf "%X\n" "$m3p9")
 #amidi -p "$port" -S "F0 52 00 $mod 31 03 02 $m3p9h 00 F7" -i 0.2
 
 #m3p10=$(xml sel -t -v "(PatchData/Module3/Prm10)" -n "$file")
-#m3p10h=$(echo "obase=16; $m3p10" | bc)
+#m3p10h=$(printf "%X\n" "$m3p10")
 #amidi -p "$port" -S "F0 52 00 $mod 31 03 0A $m3p10h 00 F7" -i 0.2
 
 #m4p0
-# ??? I've never seen a .b3p-file that uses Module4, maybe for a another Version or a hidden feature.
+# ??? I've never seen a .b3p-file that use Module4, maybe for a another version or a hidden feature.
 # at the moment only interesting for potential checksum calculations.
 
 ## Wait (for too long), but otherwise the Patch will reverse and the message not accepted.
 ## Or let the device open. 
 printf "%s\n" ""
-printf "%s\n" "Unfortunately we have to wait approx six (5.3) seconds for accepting, before we can lock the device."
+printf "%s\n" "Please wait until the device accepts the patch and the device can be resealed."
 printf "%s\n" "Otherwise the device will shelve back the patch."
 printf "%s\n" "Close Sesame!"
 sleep 6
