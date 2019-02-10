@@ -282,129 +282,129 @@ amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 00 01 00 F7"
   
     (09 = Bit Crush)  
     Left (Module0):  
-    amidi -p hw:2,0,0 -S "F0 52 00 4f 31 00 01 09 00 f7"  
+    amidi -p hw:2,0,0 -S "F0 52 00 4F 31 00 01 09 00 F7"  
   
     Middle (Module1):  
-    amidi -p hw:2,0,0 -S "F0 52 00 4f 31 01 01 09 00 f7"  
+    amidi -p hw:2,0,0 -S "F0 52 00 4F 31 01 01 09 00 F7"  
   
     Right (Module2):  
-    amidi -p hw:2,0,0 -S "F0 52 00 4f 31 02 01 09 00 f7"  
+    amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 09 00 F7"  
   
 Sort it like in the firmware!      
    
 | Preset | Command | 
 | --- | --- |    
-| OptComp:      |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 43 00 F7" |   
-| D Comp:       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 10 00 F7" |  
-| M Comp:       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 11 00 F7" |
-| DualComp:     |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 44 00 F7" |  
-| 160Comp:      |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 45 00 F7" |  
-| Limiter:      |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 46 00 F7" |  
-| Slow Attck:   |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 12 00 F7" |  
-| ZNR:          |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 13 00 F7" |  
-| GraphicEQ:    |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 14 00 F7" |  
-| ParaEQ:       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 15 00 F7" |  
-| Splitter:     |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 47 00 F7" |  
-| BottomB:      |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 48 00 F7" |    
-| Exciter:      |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 49 00 F7" |    
-| CombFLTR:     |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 16 00 F7" |  
-| AutoWah:      |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 17 00 F7" |  
-| Z-Tron:       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 18 00 F7" |  
-| M-Filter:     |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 01 00 F7" |  
-| A-Filter:     |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 4A 00 F7" |   
-| Cry:	        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 1A 00 F7" |  
-| Step:	        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 19 00 F7" |  
-| SeqFilter:    |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 0C 00 F7" |    
-| RandomFilter:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 0D 00 F7" |    
-| Booster:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 4C 00 F7" |    
-| Overdrive:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 4B 00 F7" |    
-| BassMuff:     |                                                 |
-| TScream:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 3B 00 F7" |    
-| Dist1:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 3C 00 F7" |     
-| Squeak:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 3D 00 F7" |    
-| FuzzSmile:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 3E 00 F7" |     
-| GreatMuff:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 3F 00 F7" |    
-| MetalWRLD:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 40 00 F7" |    
-| BassDrive:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 4F 00 F7" |    
-| D.I+:		|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 50 00 F7" |    
-| BassBB:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 4d 00 F7" |     
-| DI5:		|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 51 00 F7" |    
-| BassPre:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 52 00 F7" |  
-| AcBsPre:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 53 00 F7" |    
-| SVT:		|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 54 00 F7" |    
-| B-Man:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 55 00 F7" |    
-| Hrt-3500:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 56 00 F7" |    
-| SMR:		|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 57 00 F7" |    
-| FlipTop:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 58 00 F7" |    
-| Acoustic:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 59 00 F7" |    
-| Agamp:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 5A 00 F7" |    
-| Monotone:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 5B 00 F7" |   
-| Super B:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 5C 00 F7" |    
-| G-Krueger:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 5D 00 F7" |  
-| Heaven:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 5E 00 F7" |  
-| MarkB:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 5F 00 F7" |    
-| Tremolo:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 1C 00 F7" |    
-| Slicer:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 04 00 F7" |  
-| 4-Phaser:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 60 00 F7" |    
-| 8-Phaser:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 61 00 F7" |    
-| The Vibe:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 02 00 F7" |  
-| Duo-Phase:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 0B 00 F7" |    
-| WarpPhaser:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 0E 00 F7" |    
-| Chorus:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 1E 00 F7" |     
-| Detune:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 1F 00 F7" |    
-| VintageCE:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 20 00 F7" |    
-| StereoCho:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 21 00 F7" |  
-| Ensemble:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 22 00 F7" |    
-| VinFLNGR:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 23 00 F7" |    
-| Flanger:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 42 00 F7" |    
-| DynaFLNGR:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 24 00 F7" |    
-| Vibrato: 	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 25 00 F7" |   
-| Octave:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 1B 00 F7" |    
-| PitchSHFT:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 26 00 F7" |    
-| MonoPitch:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 28 00 F7" |    
-| HPS:		|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 29 00 F7" |    
-| BendCho:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 27 00 F7" |    
-| RingMod:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 1D 00 F7" |       
-| Bit Crush: 	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 09 00 F7" |  
-| Bomber:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 0A 00 F7" |  
-| MonoSyn:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 62 00 F7" |    
-| StdSyn:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 63 00 F7" |  
-| SynTlk:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 64 00 F7" |    
-| V-Syn:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 65 00 F7" |    
-| 4ChoiceSyn:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 66 00 F7" |   
-| Z-Syn:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 67 00 F7" |  
-| Z-Organ:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 03 00 F7" |  
-| Defret:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 68 00 F7" |  
-| Delay:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 2A 00 F7" |    
-| TapeEcho:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 2B 00 F7" |    
-| ModDealay:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 2C 00 F7" |    
-| AnalogDLY:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 2D 00 F7" |    
-| ReverseDelay:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 2E 00 F7" |    
-| MultiTapDelay:|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 2F 00 F7" |  
-| Dyna Delay:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 30 00 F7" |    
-| FilterDIY:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 06 00 F7" |   
-| PitchDelay:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 07 00 F7" |  
-| StereoDelay:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 08 00 F7" |  	
-| PhaseDIY	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 05 00 F7" |  
-| TriggerHoldDly:|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 0F 00 F7"|    
-| HD Reverb:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 41 00 F7" |    
-| Hall:		|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 31 00 F7" |  
-| Room:		|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 32 00 F7" |  
-| TiledRM:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 33 00 F7" |  
-| Spring:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 34 00 F7" |  
-| Arena Reverb: |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 35 00 F7" |   
-| EarlyReflection:|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 36 00 F7"|  
-| Air:		|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 37 00 F7" |  
-| CompDist:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 6B 00 F7" |  
-| OctDist:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 6C 00 F7" |    
-| AWahDist:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 6d 00 F7" |    
-| CompAWah:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 6e 00 F7" |   
-| PH+Dist:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 6f 00 F7" +|       
-| PedalVox:     |                                                 |
-| PedalWah:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 69 00 F7" |  
-| PDL Reso:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 6A 00 F7" |  
-| PDL Pitch:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 39 00 F7" |  
-| PdlMnPit:	|amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 3a 00 F7" |    
+| OptComp         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 43 00 F7" |   
+| D Comp          |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 10 00 F7" |  
+| M Comp          |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 11 00 F7" |
+| DualComp        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 44 00 F7" |  
+| 160Comp         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 45 00 F7" |  
+| Limiter         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 46 00 F7" |  
+| Slow Attck      |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 12 00 F7" |  
+| ZNR             |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 13 00 F7" |  
+| GraphicEQ       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 14 00 F7" |  
+| ParaEQ          |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 15 00 F7" |  
+| Splitter        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 47 00 F7" |  
+| BottomB         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 48 00 F7" |    
+| Exciter         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 49 00 F7" |    
+| CombFLTR        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 16 00 F7" |  
+| AutoWah         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 17 00 F7" |  
+| Z-Tron          |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 18 00 F7" |  
+| M-Filter        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 01 00 F7" |  
+| A-Filter        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 4A 00 F7" |   
+| Cry             |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 1A 00 F7" |  
+| Step            |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 19 00 F7" |  
+| SeqFilter       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 0C 00 F7" |    
+| RandomFilter    |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 0D 00 F7" |    
+| Booster         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 4C 00 F7" |    
+| Overdrive       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 4B 00 F7" |    
+| BassMuff        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 4E 00 F7" |                                                 |
+| TScream         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 3B 00 F7" |    
+| Dist1           |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 3C 00 F7" |     
+| Squeak          |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 3D 00 F7" |    
+| FuzzSmile       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 3E 00 F7" |     
+| GreatMuff       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 3F 00 F7" |    
+| MetalWRLD       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 40 00 F7" |    
+| BassDrive       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 4F 00 F7" |    
+| D.I+            |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 50 00 F7" |    
+| BassBB          |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 4d 00 F7" |     
+| DI5             |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 51 00 F7" |    
+| BassPre         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 52 00 F7" |  
+| AcBsPre         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 53 00 F7" |    
+| SVT             |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 54 00 F7" |    
+| B-Man           |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 55 00 F7" |    
+| Hrt-3500        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 56 00 F7" |    
+| SMR             |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 57 00 F7" |    
+| FlipTop         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 58 00 F7" |    
+| Acoustic        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 59 00 F7" |    
+| Agamp           |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 5A 00 F7" |    
+| Monotone        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 5B 00 F7" |   
+| Super B         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 5C 00 F7" |    
+| G-Krueger       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 5D 00 F7" |  
+| Heaven          |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 5E 00 F7" |  
+| MarkB           |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 5F 00 F7" |    
+| Tremolo         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 1C 00 F7" |    
+| Slicer          |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 04 00 F7" |  
+| 4-Phaser        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 60 00 F7" |    
+| 8-Phaser        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 61 00 F7" |    
+| The Vibe        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 02 00 F7" |  
+| Duo-Phase       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 0B 00 F7" |    
+| WarpPhaser      |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 0E 00 F7" |    
+| Chorus          |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 1E 00 F7" |     
+| Detune          |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 1F 00 F7" |    
+| VintageCE       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 20 00 F7" |    
+| StereoCho       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 21 00 F7" |  
+| Ensemble        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 22 00 F7" |    
+| VinFLNGR        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 23 00 F7" |    
+| Flanger         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 42 00 F7" |    
+| DynaFLNGR       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 24 00 F7" |    
+| Vibrato         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 25 00 F7" |   
+| Octave          |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 1B 00 F7" |    
+| PitchSHFT       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 26 00 F7" |    
+| MonoPitch       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 28 00 F7" |    
+| HPS             |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 29 00 F7" |    
+| BendCho         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 27 00 F7" |    
+| RingMod         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 1D 00 F7" |       
+| Bit Crush       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 09 00 F7" |  
+| Bomber          |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 0A 00 F7" |  
+| MonoSyn         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 62 00 F7" |    
+| StdSyn          |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 63 00 F7" |  
+| SynTlk          |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 64 00 F7" |    
+| V-Syn           |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 65 00 F7" |    
+| 4ChoiceSyn      |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 66 00 F7" |   
+| Z-Syn           |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 67 00 F7" |  
+| Z-Organ         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 03 00 F7" |  
+| Defret          |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 68 00 F7" |  
+| Delay           |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 2A 00 F7" |    
+| TapeEcho        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 2B 00 F7" |    
+| ModDealay       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 2C 00 F7" |    
+| AnalogDLY       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 2D 00 F7" |    
+| ReverseDelay    |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 2E 00 F7" |    
+| MultiTapDelay   |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 2F 00 F7" |  
+| Dyna Delay      |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 30 00 F7" |    
+| FilterDIY       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 06 00 F7" |   
+| PitchDelay      |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 07 00 F7" |  
+| StereoDelay     |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 08 00 F7" |  	
+| PhaseDIY        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 05 00 F7" |  
+| TriggerHoldDly  |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 0F 00 F7" |    
+| HD Reverb       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 41 00 F7" |    
+| Hall            |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 31 00 F7" |  
+| Room            |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 32 00 F7" |  
+| TiledRM         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 33 00 F7" |  
+| Spring          |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 34 00 F7" |  
+| Arena Reverb    |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 35 00 F7" |   
+| EarlyReflection |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 36 00 F7" |  
+| Air             |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 37 00 F7" |  
+| CompDist        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 6B 00 F7" |  
+| OctDist         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 6C 00 F7" |    
+| AWahDist        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 6D 00 F7" |    
+| CompAWah        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 6E 00 F7" |   
+| PH+Dist         |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 6F 00 F7" |       
+| PedalVox        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 38 00 F7" |
+| PedalWah        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 69 00 F7" |  
+| PDL Reso        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 6A 00 F7" |  
+| PDL Pitch       |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 39 00 F7" |  
+| PdlMnPit        |amidi -p hw:2,0,0 -S "F0 52 00 4F 31 02 01 3A 00 F7" |    
     
   
   
@@ -417,7 +417,7 @@ amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 xy 0z F7"
 | BPM | Command | 
 | --- | --- |   
 | 40  | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 00 00 F7" |  
-| 40  | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 01 00 F7" |  
+| 40  | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 28 00 F7" |  
 | 100 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 64 00 F7" |  
 | 120 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 78 00 F7" |  
 | 127 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 7F 00 F7" |  
@@ -427,7 +427,7 @@ amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 xy 0z F7"
 | 153 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 19 01 F7" |  
 | 168 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 28 01 F7" |  
 | 249 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 79 01 F7" |  
-| 250 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 7a 01 F7" |   
+| 250 | amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 7A 01 F7" |   
   
   
   
@@ -457,29 +457,29 @@ z =  F0 52 00 4F 31 04 09 7A 00 F7
 | Caracter | Command | 
 | --- | --- |   
 | Space  | F0 52 00 4F 31 04 00 20 00 F7 | 
-| ! | F0 52 00 4F 31 04 00 21 00 F7 |  
-| \# | F0 52 00 4F 31 04 00 23 00 F7 |  
-| $ | F0 52 00 4F 31 04 00 24 00 F7 |  
-| % | F0 52 00 4F 31 04 00 25 00 F7 |  
-| & | F0 52 00 4F 31 04 00 26 00 F7 |  
-| ' | F0 52 00 4F 31 04 00 27 00 F7 |  
-| ( | F0 52 00 4F 31 04 00 28 00 F7 |  
-| ) | F0 52 00 4F 31 04 00 29 00 F7 |  
-| \+ | F0 52 00 4F 31 04 00 2B 00 F7 |  
-| , | F0 52 00 4F 31 04 00 2C 00 F7 |  
-| \- | F0 52 00 4F 31 04 00 2D 00 F7 |  
-| . | F0 52 00 4F 31 04 00 2E 00 F7 |  
-| ; | F0 52 00 4F 31 04 00 3B 00 F7 |  
-| = | F0 52 00 4F 31 04 00 3D 00 F7 |  
-| @ | F0 52 00 4F 31 04 00 40 00 F7 |  
-| [ | F0 52 00 4F 31 04 00 5B 00 F7 |  
-| ] | F0 52 00 4F 31 04 00 5D 00 F7 |  
-| ^ | F0 52 00 4F 31 04 00 5E 00 F7 |  
-| _ | F0 52 00 4F 31 04 00 5F 00 F7 |  
-| ` | F0 52 00 4F 31 04 00 60 00 F7 |  
-| { | F0 52 00 4F 31 04 00 7B 00 F7 |  
-| } | F0 52 00 4F 31 04 00 7D 00 F7 |  
-| ~ | F0 52 00 4F 31 04 00 7E 00 F7 |  
+| !      | F0 52 00 4F 31 04 00 21 00 F7 |  
+| \#     | F0 52 00 4F 31 04 00 23 00 F7 |  
+| $      | F0 52 00 4F 31 04 00 24 00 F7 |  
+| %      | F0 52 00 4F 31 04 00 25 00 F7 |  
+| &      | F0 52 00 4F 31 04 00 26 00 F7 |  
+| '      | F0 52 00 4F 31 04 00 27 00 F7 |  
+| (      | F0 52 00 4F 31 04 00 28 00 F7 |  
+| )      | F0 52 00 4F 31 04 00 29 00 F7 |  
+| \+     | F0 52 00 4F 31 04 00 2B 00 F7 |  
+| ,      | F0 52 00 4F 31 04 00 2C 00 F7 |  
+| \-     | F0 52 00 4F 31 04 00 2D 00 F7 |  
+| .      | F0 52 00 4F 31 04 00 2E 00 F7 |  
+| ;      | F0 52 00 4F 31 04 00 3B 00 F7 |  
+| =      | F0 52 00 4F 31 04 00 3D 00 F7 |  
+| @      | F0 52 00 4F 31 04 00 40 00 F7 |  
+| [      | F0 52 00 4F 31 04 00 5B 00 F7 |  
+| ]      | F0 52 00 4F 31 04 00 5D 00 F7 |  
+| ^      | F0 52 00 4F 31 04 00 5E 00 F7 |  
+| _      | F0 52 00 4F 31 04 00 5F 00 F7 |  
+| `      | F0 52 00 4F 31 04 00 60 00 F7 |  
+| {      | F0 52 00 4F 31 04 00 7B 00 F7 |  
+| }      | F0 52 00 4F 31 04 00 7D 00 F7 |  
+| ~      | F0 52 00 4F 31 04 00 7E 00 F7 |  
   
   
   
@@ -542,11 +542,11 @@ F0 52 00 4F 31 03 09 0x 00 F7
 
 | Option | Command | 
 | --- | --- | 
-| Level | F0 52 00 4F 31 03 02 xx 00 F7 |  
-|Balance | F0 52 00 4F 31 03 0A xx 00 F7 |
-|        |                               |
-|CTRL SW | F0 52 00 4F 31 03 06 04 00 F7 |
-| Unknown | ?F0 52 00 4F 31 03 07 00 00 F7? |   
+| Level    | F0 52 00 4F 31 03 02 xx 00 F7 |  
+|Balance   | F0 52 00 4F 31 03 0A xx 00 F7 |
+|          |                               |
+|CTRL SW   | F0 52 00 4F 31 03 06 04 00 F7 |
+| Unknown  | ?F0 52 00 4F 31 03 07 00 00 F7? |   
   
   
 
@@ -593,20 +593,20 @@ yy = arbitrarily
   
 | xx | Result | 
 | --- | --- | 
-| 0B | okay |  
+| 0B | okay  |  
 | 0C | crash |  
 | .. | crash |
 | 1A | crash |
-| 1B | okay |
+| 1B | okay  |
 | 1C | crash |
 | 1E | crash |
-| 1F | okay |
+| 1F | okay  |
 | 20 | crash |
-| 21 | okay |
-| 22 | okay |
+| 21 | okay  |
+| 22 | okay  |
 | 23 | crash |
 | 24 | crash |
-| 25 | okay |
+| 25 | okay  |
 | 26 | crash |
 | 27 | crash |
 | .. | crash |
