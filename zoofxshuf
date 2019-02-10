@@ -22,12 +22,13 @@ usage() {
 }
 
 version() { 
-  printf "%s\n" "0.00.001 alpha"
+  printf "%s\n" "0.00.002 alpha"
   exit 
 }
 
 shuffx() {
   printf "%X\n" "$(shuf -i 1-111 -n 1)"
+
 }
 
 shuftemp0() {
@@ -38,26 +39,40 @@ shuftemp1() {
   printf "%X\n" "$(shuf -i 0-122 -n 1)"
 }
 
-shufbar() {
+shufbar0() {
+  printf "%s\n" "$(shuf -i 0-1 -n 1)"
+}
+
+shufbar1() {
+  printf "%s\n" "$(shuf -i 0-1 -n 1)"
+}
+
+shufbar2() {
   printf "%s\n" "$(shuf -i 0-1 -n 1)"
 }
 
 shufknob() {
-  select=$(printf "%X\n" "$(shuf -i 0-12 -n 1)")
+  select=$(printf "%X\n" "$(shuf -i 0-18 -n 1)")
   case "$select" in
-    '0') printf "%X\n" "$(shuf -i 32-64 -n 1)" ;;
-    '1') printf "%X\n" "$(shuf -i 3-47 -n 1)" ;;
-    '2') printf "%X\n" "$(shuf -i 0-100 -n 1)" ;;
-    '3') printf "%X\n" "$(shuf -i 4-12 -n 1)" ;;
-    '4') printf "%X\n" "$(shuf -i 10-42 -n 1)" ;;
-    '5') printf "%X\n" "$(shuf -i 0-9 -n 1)" ;;
-    '6') printf "%X\n" "$(shuf -i 10-19 -n 1)" ;;
-    '7') printf "%X\n" "$(shuf -i 7-32 -n 1)" ;;
-    '8') printf "%X\n" "$(shuf -i 30-64 -n 1)" ;;
-    '9') printf "%X\n" "$(shuf -i 15-21 -n 1)" ;;
-    '10') printf "%X\n" "$(shuf -i 50-100 -n 1)" ;;
-    '11') printf "%X\n" "$(shuf -i 16-72 -n 1)" ;;
-    '12') printf "%X\n" "$(shuf -i 12-48 -n 1)" ;;
+     '0') printf "%X\n" "$(shuf -i 32-64  -n 1)"  ;;
+     '1') printf "%X\n" "$(shuf -i 3-47   -n 1)"  ;;
+     '2') printf "%X\n" "$(shuf -i 0-100  -n 1)"  ;;
+     '3') printf "%X\n" "$(shuf -i 4-12   -n 1)"  ;;
+     '4') printf "%X\n" "$(shuf -i 10-42  -n 1)"  ;;
+     '5') printf "%X\n" "$(shuf -i 0-9    -n 1)"  ;;
+     '6') printf "%X\n" "$(shuf -i 10-19  -n 1)"  ;;
+     '7') printf "%X\n" "$(shuf -i 7-32   -n 1)"  ;;
+     '8') printf "%X\n" "$(shuf -i 30-64  -n 1)"  ;;
+     '9') printf "%X\n" "$(shuf -i 15-21  -n 1)"  ;;
+    '10') printf "%X\n" "$(shuf -i 50-100 -n 1)"  ;;
+    '11') printf "%X\n" "$(shuf -i 16-72  -n 1)"  ;;
+    '12') printf "%X\n" "$(shuf -i 12-48  -n 1)"  ;;
+    '13') printf "%X\n" "$(shuf -i 80-90  -n 1)"  ;;
+    '14') printf "%X\n" "$(shuf -i 42-78  -n 1)"  ;;
+    '15') printf "%X\n" "$(shuf -i 0-16   -n 1)"  ;;
+    '16') printf "%X\n" "$(shuf -i 70-90  -n 1)"  ;;
+    '17') printf "%X\n" "$(shuf -i 0-10   -n 1)"  ;;
+    '18') printf "%X\n" "$(shuf -i 0-1    -n 1)"  ;;
    esac
 }
 
@@ -77,9 +92,8 @@ do
             fi
             set -u
             printf "%s\n" "$bank"
-            # not working in dash,yash
-            #bankd=$(printf "%d\n" "$((16#$bank))")
-            bankd=$(printf "%s\n" "ibase=16; $bank" | bc)
+            # not working in mrsh
+            bankd=$(printf "%d\n" "0x$bank")
             printf "%s\n" "bankd: $bankd" 
             banks=$((bankd - 160))
             printf "%s\n" "banks: $banks"
@@ -87,7 +101,7 @@ do
             printf "%s\n" "varc: $varc"
             varh=$(printf "%X\n" "$varc")
             printf "%s\n" "varh: $varh"
-	    amidi -p "$port" -S "C0 $varh" > /dev/null
+	    amidi -p "$port" -S "C0 $varh"
 	    ;;
         'h')
             usage
@@ -99,8 +113,9 @@ do
               port=$(amidi -l | tail -n 1 | cut -d " " -f 3) 
             fi
             set -u
+            # change 4F to mod
 	    amidi -p "$port" -S "F0 52 00 4F 50 F7" && amidi -p "$port" -S "F0 52 00 4F 31 03 09 $flip 00 F7" \
-            && amidi -p "$port" -S "F0 52 00 4F 51 F7" >&2
+            && amidi -p "$port" -S "F0 52 00 4F 51 F7" 
             ;;
         'v')
             version
@@ -117,7 +132,6 @@ if [ -z "$port" ]; then
 fi
 set -u
 
-
 # Identify device
 id=$(amidi -p "$port" -S "F0 7E 00 06 01 F7" -d -t 0.4 | tail -n 1)
 
@@ -126,103 +140,113 @@ mod=$(printf "%s\n" "$id" | cut -c 19-21)
 
 # Unlock device
 #printf "%s\n" "Open Sesame!"
-amidi -p "$port" -S "F0 52 00 $mod 50 F7" -i 0.2
+amidi -p "$port" -S "F0 52 00 $mod 50 F7" -i 0.01
 
 # Shuffle
 # Module0 left
-amidi -p "$port" -S "F0 52 00 4F 31 00 01 $(shuffx) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 00 01 $(shuffx) 00 F7" -i 0.01
 
 # Module1 middle
-amidi -p "$port" -S "F0 52 00 4F 31 01 01 $(shuffx) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 01 01 $(shuffx) 00 F7" -i 0.01
 
 # Module2 right
-amidi -p "$port" -S "F0 52 00 4F 31 02 01 $(shuffx) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 02 01 $(shuffx) 00 F7" -i 0.01
 
-#Stompbar Module0 left:             
-amidi -p "$port" -S "F0 52 00 4F 31 00 00 $(shufbar) 00 F7"
+# Stompbar
+a=$(shufbar0)
+b=$(shufbar1)
+c=$(shufbar2)
+while [ "$a" -eq '0' ] && [ "$b" -eq '0' ] && [ "$c" -eq '0' ]; do
+  a=$(shufbar0)
+  b=$(shufbar1)
+  c=$(shufbar2)
+done
 
-#Stompbar Module1 middle:             
-amidi -p "$port" -S "F0 52 00 4F 31 01 00 $(shufbar) 00 F7"
+# Stompbar Module0 left:             
+amidi -p "$port" -S "F0 52 00 $mod 31 00 00 $a 00 F7" -i 0.01
 
-#Stompbar Module1 right:             
-amidi -p "$port" -S "F0 52 00 4F 31 02 00 $(shufbar) 00 F7"
+# Stompbar Module1 middle:             
+amidi -p "$port" -S "F0 52 00 $mod 31 01 00 $b 00 F7" -i 0.01
+
+# Stompbar Module1 right:             
+amidi -p "$port" -S "F0 52 00 $mod 31 02 00 $c 00 F7" -i 0.01
 
 # Knobs Module0 left Knob1 left page1:
-amidi -p "$port" -S "F0 52 00 4F 31 00 02 $(shufknob) 00 F7"  
+amidi -p "$port" -S "F0 52 00 $mod 31 00 02 $(shufknob) 00 F7" -i 0.01
 # Knobs Module0 left Knob2 middle page1:
-amidi -p "$port" -S "F0 52 00 4F 31 00 03 $(shufknob) 00 F7"  
+amidi -p "$port" -S "F0 52 00 $mod 31 00 03 $(shufknob) 00 F7" -i 0.01
 # Knobs Module0 left Knob3 right page1:
-amidi -p "$port" -S "F0 52 00 4F 31 00 04 $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 00 04 $(shufknob) 00 F7" -i 0.01
 # Knobs Module0 left Knob1 left page2:
-amidi -p "$port" -S "F0 52 00 4F 31 00 05 $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 00 05 $(shufknob) 00 F7" -i 0.01
 # Knobs Module0 left Knob2 middle page2:
-amidi -p "$port" -S "F0 52 00 4F 31 00 06 $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 00 06 $(shufknob) 00 F7" -i 0.01
 # Knobs Module0 left Knob3 right page2:
-amidi -p "$port" -S "F0 52 00 4F 31 00 07 $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 00 07 $(shufknob) 00 F7" -i 0.01
 # Knobs Module0 left Knob1 left page3:
-amidi -p "$port" -S "F0 52 00 4F 31 00 08 $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 00 08 $(shufknob) 00 F7" -i 0.01
 # Knobs Module0 left Knob2 middle page3:
-amidi -p "$port" -S "F0 52 00 4F 31 00 09 $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 00 09 $(shufknob) 00 F7" -i 0.01
 # Knobs Module0 left Knob3 right page3:
-amidi -p "$port" -S "F0 52 00 4F 31 00 0A $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 00 0A $(shufknob) 00 F7" -i 0.01
 
 # Knobs Module1 left Knob1 left page1:
-amidi -p "$port" -S "F0 52 00 4F 31 01 02 $(shufknob) 00 F7"  
+amidi -p "$port" -S "F0 52 00 $mod 31 01 02 $(shufknob) 00 F7" -i 0.01
 # Knobs Module1 left Knob2 middle page1:
-amidi -p "$port" -S "F0 52 00 4F 31 01 03 $(shufknob) 00 F7"  
+amidi -p "$port" -S "F0 52 00 $mod 31 01 03 $(shufknob) 00 F7" -i 0.01
 # Knobs Module1 left Knob3 right page1:
-amidi -p "$port" -S "F0 52 00 4F 31 01 04 $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 01 04 $(shufknob) 00 F7" -i 0.01
 # Knobs Module1 left Knob1 left page2:
-amidi -p "$port" -S "F0 52 00 4F 31 01 05 $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 01 05 $(shufknob) 00 F7" -i 0.01
 # Knobs Module1 left Knob2 middle page2:
-amidi -p "$port" -S "F0 52 00 4F 31 01 06 $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 01 06 $(shufknob) 00 F7" -i 0.01
 # Knobs Module1 left Knob3 right page2:
-amidi -p "$port" -S "F0 52 00 4F 31 01 07 $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 01 07 $(shufknob) 00 F7" -i 0.01
 # Knobs Module1 left Knob1 left page3:
-amidi -p "$port" -S "F0 52 00 4F 31 01 08 $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 01 08 $(shufknob) 00 F7" -i 0.01
 # Knobs Module1 left Knob2 middle page3:
-amidi -p "$port" -S "F0 52 00 4F 31 01 09 $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 01 09 $(shufknob) 00 F7" -i 0.01
 # Knobs Module1 left Knob3 right page3:
-amidi -p "$port" -S "F0 52 00 4F 31 01 0A $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 01 0A $(shufknob) 00 F7" -i 0.01
 
 # Knobs Module2 left Knob1 left page1:
-amidi -p "$port" -S "F0 52 00 4F 31 02 02 $(shufknob) 00 F7"  
+amidi -p "$port" -S "F0 52 00 $mod 31 02 02 $(shufknob) 00 F7" -i 0.01
 # Knobs Module2 left Knob2 middle page1:
-amidi -p "$port" -S "F0 52 00 4F 31 02 03 $(shufknob) 00 F7"  
+amidi -p "$port" -S "F0 52 00 $mod 31 02 03 $(shufknob) 00 F7" -i 0.01
 # Knobs Module2 left Knob3 right page1:
-amidi -p "$port" -S "F0 52 00 4F 31 02 04 $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 02 04 $(shufknob) 00 F7" -i 0.01
 # Knobs Module2 left Knob1 left page2:
-amidi -p "$port" -S "F0 52 00 4F 31 02 05 $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 02 05 $(shufknob) 00 F7" -i 0.01
 # Knobs Module2 left Knob2 middle page2:
-amidi -p "$port" -S "F0 52 00 4F 31 02 06 $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 02 06 $(shufknob) 00 F7" -i 0.01
 # Knobs Module2 left Knob3 right page2:
-amidi -p "$port" -S "F0 52 00 4F 31 02 07 $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 02 07 $(shufknob) 00 F7" -i 0.01
 # Knobs Module2 left Knob1 left page3:
-amidi -p "$port" -S "F0 52 00 4F 31 02 08 $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 02 08 $(shufknob) 00 F7" -i 0.01
 # Knobs Module2 left Knob2 middle page3:
-amidi -p "$port" -S "F0 52 00 4F 31 02 09 $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 02 09 $(shufknob) 00 F7" -i 0.01
 # Knobs Module2 left Knob3 right page3:
-amidi -p "$port" -S "F0 52 00 4F 31 02 0A $(shufknob) 00 F7"
+amidi -p "$port" -S "F0 52 00 $mod 31 02 0A $(shufknob) 00 F7" -i 0.01
 
 # Tempo
-a=$(shufbar)
-if [ "$a" -eq '0' ]; then
-  amidi -p "$port" -S "F0 52 00 4F 31 03 08 $(shuftemp0) 00 F7"
+d=$(shufbar0)
+if [ "$d" -eq '0' ]; then
+  amidi -p "$port" -S "F0 52 00 $mod 31 03 08 $(shuftemp0) 00 F7" -i 0.01
 else
-  amidi -p "$port" -S "F0 52 00 4F 31 03 08 $(shuftemp1) 01 F7"
+  amidi -p "$port" -S "F0 52 00 $mod 31 03 08 $(shuftemp1) 01 F7" -i 0.01
 fi
 
 # Display name ShufflePnP
-amidi -p "$port" -S "F0 52 00 $mod 31 04 00 53 00 F7" -i 0.2
-amidi -p "$port" -S "F0 52 00 $mod 31 04 01 68 00 F7" -i 0.2
-amidi -p "$port" -S "F0 52 00 $mod 31 04 02 75 00 F7" -i 0.2
-amidi -p "$port" -S "F0 52 00 $mod 31 04 03 66 00 F7" -i 0.2
-amidi -p "$port" -S "F0 52 00 $mod 31 04 04 66 00 F7" -i 0.2
-amidi -p "$port" -S "F0 52 00 $mod 31 04 05 6c 00 F7" -i 0.2
-amidi -p "$port" -S "F0 52 00 $mod 31 04 06 65 00 F7" -i 0.2
-amidi -p "$port" -S "F0 52 00 $mod 31 04 07 50 00 F7" -i 0.2
-amidi -p "$port" -S "F0 52 00 $mod 31 04 08 6E 00 F7" -i 0.2
-amidi -p "$port" -S "F0 52 00 $mod 31 04 09 50 00 F7" -i 0.2
+amidi -p "$port" -S "F0 52 00 $mod 31 04 00 53 00 F7" -i 0.01
+amidi -p "$port" -S "F0 52 00 $mod 31 04 01 68 00 F7" -i 0.01
+amidi -p "$port" -S "F0 52 00 $mod 31 04 02 75 00 F7" -i 0.01
+amidi -p "$port" -S "F0 52 00 $mod 31 04 03 66 00 F7" -i 0.01
+amidi -p "$port" -S "F0 52 00 $mod 31 04 04 66 00 F7" -i 0.01
+amidi -p "$port" -S "F0 52 00 $mod 31 04 05 6c 00 F7" -i 0.01
+amidi -p "$port" -S "F0 52 00 $mod 31 04 06 65 00 F7" -i 0.01
+amidi -p "$port" -S "F0 52 00 $mod 31 04 07 50 00 F7" -i 0.01
+amidi -p "$port" -S "F0 52 00 $mod 31 04 08 6E 00 F7" -i 0.01
+amidi -p "$port" -S "F0 52 00 $mod 31 04 09 50 00 F7" -i 0.01
 
 #sleep 6
 # Lock device again:
