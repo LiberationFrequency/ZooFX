@@ -14,6 +14,7 @@ usage() {
   printf "%s\n" "Usage: $0 [-h] [-v] [-b bank]"
   printf "%s\n" "  -b  Add on. Select bank (A0 - J9). Need capital letters. Works only from A0 to F9 at the moment."
   printf "%s\n" "  -h  Help. Display this message and quit."
+  printf "%s\n" "  -f  Fill all banks with randon data."
   printf "%s\n" "  -p  Specify a hardware port, e.g. hw:2,0,0 or simply hw:2"
   printf "%s\n" "  -r  Add on. Reset changes from the preset and quit. Works from time to time." #(?Not inside Total-/Globalmodus)
   printf "%s\n" "  -s  Add on. Flip signal chain path forward/backward. (0 / 1)"
@@ -22,37 +23,56 @@ usage() {
 }
 
 version() { 
-  printf "%s\n" "0.00.002 alpha"
+  printf "%s\n" "0.00.003 alpha"
   exit 
+}
+
+fill() {
+  set +u
+  if [ -z "$port" ]; then
+    port=$(amidi -l | tail -n 1 | cut -d " " -f 3) 
+  fi
+  set -u
+  i=0
+  while [ "$i" -lt '100' ]; do
+  varh=$(printf "%X\n" "$i")
+  # Change Patch from A0 to J9:
+  amidi -p "$port" -S "C0 $varh" -i 0.01
+  # Not working in mrsh. Expected done.
+  i=$(((i + 1)))
+  # Not working in zsh. Want call fill
+  sh "$0"
+  done
 }
 
 shuffx() {
   printf "%X\n" "$(shuf -i 1-111 -n 1)"
-
+#  tools/test/go/bin/zoofxshuffler --min=1 --max=111
 }
 
 shuftemp0() {
   printf "%X\n" "$(shuf -i 40-127 -n 1)"
+#  tools/test/go/bin/zoofxshuffler --min=40 --max=127
 }
 
 shuftemp1() {
   printf "%X\n" "$(shuf -i 0-122 -n 1)"
+#  tools/test/go/bin/zoofxshuffler --min=0 --max=122
 }
 
-shufbar0() {
+shufbar() {
   printf "%s\n" "$(shuf -i 0-1 -n 1)"
+#  tools/test/go/bin/zoofxshuffler --min=0 --max=1
 }
 
-shufbar1() {
-  printf "%s\n" "$(shuf -i 0-1 -n 1)"
+shufname() {
+  printf "%s\n" "$(shuf -i 48-57 -n 1)"
+#  tools/test/go/bin/zoofxshuffler --min=48 --max=57
 }
 
-shufbar2() {
-  printf "%s\n" "$(shuf -i 0-1 -n 1)"
-}
 
 shufknob() {
-  select=$(printf "%X\n" "$(shuf -i 0-18 -n 1)")
+  select=$(printf "%X\n" "$(shuf -i 0-17 -n 1)")
   case "$select" in
      '0') printf "%X\n" "$(shuf -i 32-64  -n 1)"  ;;
      '1') printf "%X\n" "$(shuf -i 3-47   -n 1)"  ;;
@@ -72,12 +92,36 @@ shufknob() {
     '15') printf "%X\n" "$(shuf -i 0-16   -n 1)"  ;;
     '16') printf "%X\n" "$(shuf -i 70-90  -n 1)"  ;;
     '17') printf "%X\n" "$(shuf -i 0-10   -n 1)"  ;;
-    '18') printf "%X\n" "$(shuf -i 0-1    -n 1)"  ;;
    esac
 }
 
+
+#shufknob() {
+#  select=$(tools/test/go/bin/zoofxshuffler --min=0 --max=17)
+#  case "$select" in
+#    '00') tools/test/go/bin/zoofxshuffler --min=32  --max=64   ;;
+#    '01') tools/test/go/bin/zoofxshuffler --min=3   --max=47   ;;
+#    '02') tools/test/go/bin/zoofxshuffler --min=0   --max=100  ;;
+#    '03') tools/test/go/bin/zoofxshuffler --min=4   --max=12   ;;
+#    '04') tools/test/go/bin/zoofxshuffler --min=10  --max=42   ;;
+#    '05') tools/test/go/bin/zoofxshuffler --min=0   --max=9    ;;
+#    '06') tools/test/go/bin/zoofxshuffler --min=10  --max=19   ;;
+#    '07') tools/test/go/bin/zoofxshuffler --min=7   --max=32   ;;
+#    '08') tools/test/go/bin/zoofxshuffler --min=30  --max=64   ;;
+#    '09') tools/test/go/bin/zoofxshuffler --min=15  --max=21   ;;
+#    '0A') tools/test/go/bin/zoofxshuffler --min=50  --max=100  ;;
+#    '0B') tools/test/go/bin/zoofxshuffler --min=16  --max=72   ;;
+#    '0C') tools/test/go/bin/zoofxshuffler --min=12  --max=48   ;;
+#    '0D') tools/test/go/bin/zoofxshuffler --min=80  --max=90   ;;
+#    '0E') tools/test/go/bin/zoofxshuffler --min=42  --max=78   ;;
+#    '0F') tools/test/go/bin/zoofxshuffler --min=0   --max=16   ;;
+#    '10') tools/test/go/bin/zoofxshuffler --min=70  --max=90   ;;
+#    '11') tools/test/go/bin/zoofxshuffler --min=0   --max=10   ;;
+#   esac
+#}
+
 bank=""
-optspec="p:b:hvs:"
+optspec="p:b:hfvs:"
 while getopts "$optspec" optchar
 do
     case "${optchar}" in
@@ -105,6 +149,17 @@ do
 	    ;;
         'h')
             usage
+            ;;
+        'f')
+            printf "%s\n" "This will override all banks with random data. All data will be lost."
+            printf "%s\n" "You should make a backup before you proceed!"
+            printf "%s" "Are you sure? (y/N)?"
+            read -r answer
+            if [ "$answer" != "${answer#[Yy]}" ]; then
+              fill
+            else
+              exit 23
+            fi
             ;;
         's')
             flip=${OPTARG}
@@ -153,13 +208,13 @@ amidi -p "$port" -S "F0 52 00 $mod 31 01 01 $(shuffx) 00 F7" -i 0.01
 amidi -p "$port" -S "F0 52 00 $mod 31 02 01 $(shuffx) 00 F7" -i 0.01
 
 # Stompbar
-a=$(shufbar0)
-b=$(shufbar1)
-c=$(shufbar2)
+a=$(shufbar)
+b=$(shufbar)
+c=$(shufbar)
 while [ "$a" -eq '0' ] && [ "$b" -eq '0' ] && [ "$c" -eq '0' ]; do
-  a=$(shufbar0)
-  b=$(shufbar1)
-  c=$(shufbar2)
+  a=$(shufbar)
+  b=$(shufbar)
+  c=$(shufbar)
 done
 
 # Stompbar Module0 left:             
@@ -229,7 +284,7 @@ amidi -p "$port" -S "F0 52 00 $mod 31 02 09 $(shufknob) 00 F7" -i 0.01
 amidi -p "$port" -S "F0 52 00 $mod 31 02 0A $(shufknob) 00 F7" -i 0.01
 
 # Tempo
-d=$(shufbar0)
+d=$(shufbar)
 if [ "$d" -eq '0' ]; then
   amidi -p "$port" -S "F0 52 00 $mod 31 03 08 $(shuftemp0) 00 F7" -i 0.01
 else
@@ -237,17 +292,21 @@ else
 fi
 
 # Display name ShufflePnP
-amidi -p "$port" -S "F0 52 00 $mod 31 04 00 53 00 F7" -i 0.01
-amidi -p "$port" -S "F0 52 00 $mod 31 04 01 68 00 F7" -i 0.01
-amidi -p "$port" -S "F0 52 00 $mod 31 04 02 75 00 F7" -i 0.01
-amidi -p "$port" -S "F0 52 00 $mod 31 04 03 66 00 F7" -i 0.01
-amidi -p "$port" -S "F0 52 00 $mod 31 04 04 66 00 F7" -i 0.01
-amidi -p "$port" -S "F0 52 00 $mod 31 04 05 6c 00 F7" -i 0.01
-amidi -p "$port" -S "F0 52 00 $mod 31 04 06 65 00 F7" -i 0.01
-amidi -p "$port" -S "F0 52 00 $mod 31 04 07 50 00 F7" -i 0.01
-amidi -p "$port" -S "F0 52 00 $mod 31 04 08 6E 00 F7" -i 0.01
-amidi -p "$port" -S "F0 52 00 $mod 31 04 09 50 00 F7" -i 0.01
+amidi -p "$port" -S "F0 52 00 $mod 31 04 00 50 00 F7" -i 0.01
+amidi -p "$port" -S "F0 52 00 $mod 31 04 01 6E 00 F7" -i 0.01
+amidi -p "$port" -S "F0 52 00 $mod 31 04 02 50 00 F7" -i 0.01
+amidi -p "$port" -S "F0 52 00 $mod 31 04 03 2D 00 F7" -i 0.01
+amidi -p "$port" -S "F0 52 00 $mod 31 04 04 $(shufname) 00 F7" -i 0.01
+amidi -p "$port" -S "F0 52 00 $mod 31 04 05 $(shufname) 00 F7" -i 0.01
+amidi -p "$port" -S "F0 52 00 $mod 31 04 06 $(shufname) 00 F7" -i 0.01
+amidi -p "$port" -S "F0 52 00 $mod 31 04 07 $(shufname) 00 F7" -i 0.01
+amidi -p "$port" -S "F0 52 00 $mod 31 04 08 $(shufname) 00 F7" -i 0.01
+amidi -p "$port" -S "F0 52 00 $mod 31 04 09 $(shufname) 00 F7" -i 0.01
+
 
 #sleep 6
 # Lock device again:
 #amidi -p "$port" -S "F0 52 00 $mod 51 F7"
+
+
+
