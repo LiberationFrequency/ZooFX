@@ -11,13 +11,14 @@ What is a ...?
 
 | Buzzword | Description | 
 | --- | --- | 
-| Preset | The effect itself, integrated in the firmware.|  
-| Patch | The whole configuration of one signal chain, etc. you edited.|  
-| Bank | The whole storage of max. 100 patches. (A0-J9)|  
+| Module | The three (+n on other devices) effect slots, left, middle, right.   |
+| Preset | The effect itself, integrated in the firmware.                       |  
+| Patch  | The whole configuration of the three (+n) presets. One signal chain. |  
+| Bank   | The whole storage of max. 100 patches. (A0-J9) (0-99)                |  
   
   
 FYI: amidi -hw:2,0,0 can directed to other ports in other setups.  
-All examples obtain to a B3 and tested on Arch Linux mainly with zsh.  
+All examples obtain to a B3 and tested on Arch Linux mainly with bash, dash, mksh, mrsh, yash, zsh.  
   
   
 Upper case SysEx messages = transmit to device  
@@ -70,7 +71,7 @@ Press STORE/SWAP and start the device.
   
     
 ### Unlock device:  
-The device is locked for SysEx messages by default. It accept only control hhange and general messages. Open Sesame!  
+The device is locked for SysEx messages by default. It accept only control change and general messages. Open Sesame!  
   
     amidi -p hw:2,0,0 -S "F0 52 00 4F 50 F7"   
 ...no answer.  
@@ -411,7 +412,7 @@ Sort it like in the firmware!
   
 ## Change Tempo:  
   
-x changes the value for 16 bpm, y for 1 bpm. If the value rise above 127, it counts z to 1 and xy change to zero.  
+x changes the value by 16 bpm, y by 1 bpm. If the value rise above 127, it counts z to 1 and xy change to zero.  
 amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 xy 0z F7"  
   
 | BPM | Command | 
@@ -434,7 +435,7 @@ amidi -p hw:2,0,0 -S "F0 52 00 4F 31 03 08 xy 0z F7"
 ## Names:  
   
     F0 52 00 4F 31 04 xx yz 00 F7  
-xx = Ten digits / 0-9  
+xx = Ten digits / 00-09  
 yz = Character   
 
 0123456789  
@@ -531,13 +532,13 @@ x
 
 
 
-## Global:  
+## Global Mode:  
   
 Flip signal path forward/backward (0x = 0 oder 1):    
 F0 52 00 4F 31 03 09 0x 00 F7  
 
 
-## Im Total-Modus 
+## Total Mode 
    
 
 | Option | Command | 
@@ -546,7 +547,7 @@ F0 52 00 4F 31 03 09 0x 00 F7
 |Balance   | F0 52 00 4F 31 03 0A xx 00 F7 |
 |          |                               |
 |CTRL SW   | F0 52 00 4F 31 03 06 04 00 F7 |
-| Unknown  | ?F0 52 00 4F 31 03 07 00 00 F7? |   
+| Unknown  |?F0 52 00 4F 31 03 07 00 00 F7? |   
   
   
 
@@ -773,7 +774,7 @@ F7 = SysEx end
   
  
 
-Fußschalter mXp0  
+Foot Switch  mXp0  
 F0 52 00 4F 28 20 7F 24 40 16 50 01 32 00 00 00 00 00 00 26 2E 10 40 00 10 02 00 00 00 08 00 00 00 28 26 40 02 00 00 00 0D 4C 2A 00 00 01 32 64 60 00 00 03 00 00 0C 4E 6F 69 73 65 47 00 46 75 7A 7A 00 F7  
 F0 52 00 4F 28 20 7E 24 40 16 50 01 32 00 00 00 00 00 00 27 2E 10 40 00 10 02 00 00 00 08 00 00 00 28 26 40 02 00 00 00 0D 4C 2A 00 00 01 32 64 60 00 00 03 00 00 0C 4E 6F 69 73 65 47 00 46 75 7A 7A 00 F7  
 F0 52 00 4F 28 20 7F 24 40 16 50 01 32 00 00 00 00 00 00 27 2E 10 40 00 10 02 00 00 00 08 00 00 00 28 26 40 02 00 00 00 0D 4C 2A 00 00 01 32 64 60 00 00 03 00 00 0C 4E 6F 69 73 65 47 00 46 75 7A 7A 00 F7  
