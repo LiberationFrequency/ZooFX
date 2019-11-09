@@ -1,0 +1,289 @@
+#!/usr/bin/env bash
+
+# Proof of concept, how to backup a single patch and the whole bank from a ZFXB3
+# and convert it to several formats simultaneously.
+# It reads the name of the patch and set it as filename.
+# It creates two (amidi) SysEx files, the .b3x is a message without a locator information. 
+# The .b3z contains a similar representation of the patch with a locator compared to CC. 
+# Additional it creates a human readable plain text file. In total 301 + 100 objects should be in the folders.
+# Work in progress.
+# e.g.
+# ./zfxbkp.sh -s /save/to/path/
+
+# Known issues
+# Two or more patches with the same name will be overwritten. 
+# Very slow, but otherwise it is a mess sometimes. Not so urgend in this phase.
+# It is recommend to backup a fresh booted device, because it replies sometimes
+# the full amidi dump cache or similar, so the script can not extract the informations. 
+
+# Script handling:
+#set -euf -o pipefail
+
+# Parse arguments
+usage() {
+  printf "%s\n" "Usage: $0 [-h] [-v] [-s /patch/to/directory]"
+
+  printf "%s\n" "  -h  Help. Display this message and quit."
+  printf "%s\n" "  -p  Specify a hardware port, e.g. hw:2,0,0 or simply hw:2"
+  printf "%s\n" "  -s  Save bank to directory. e.g. ./zfxbackup.sh -s /home/user/ZFXB3_Patches/Bankname"
+  printf "%s\n" "  -t  Transmit bank back to device. It is recommend to play it back with on fresh boot device."  
+  printf "%s\n" "      e.g. ./zfxbackup.sh -t /home/user/ZFXB3_Patches/Bankname/bank"
+  printf "%s\n" "      Play it back with 'amidi -p hw:2,0,0 -s filename' manually after unlock."
+  printf "%s\n" "      You can also send the SysEx message directly shown in the plain text file." 
+  printf "%s\n" "  -v  Version. Print version number and quit."
+  exit
+}
+
+dirname=""
+bankname=bank
+optspec="p:hvs:t:"
+while getopts "$optspec" optchar
+do
+    case "${optchar}" in
+        p)  
+            port=${OPTARG}
+            ;;
+        h)
+            usage
+	    exit
+            ;;
+        s)
+            dirname="$OPTARG"
+            ;;
+        t)
+            path="$OPTARG"
+            set +u
+            if [ -z "$port" ]; then
+            port=$(amidi -l | tail -n 1 | cut -d " " -f 3) 
+            fi
+            set -u
+            printf "%s\n" "$path"
+            amidi -p "$port" -S "F0 52 00 4F 50 F7" -i 0.05
+            i=0
+            for i in $(seq 00 01 99); do
+              amidi -p "$port" -s "$path"/"$(printf "%.2X\n" "$i")"_*.b3z -i 0.05
+            done
+            amidi -p "$port" -S "F0 52 00 4F 51 F7"
+            exit 0
+            ;;
+        v)
+            printf "%s\n" "0.00.007 alpha"
+            exit
+            ;;
+    	:) 
+            printf "%s\n" "Error: -$OPTARG requires an argument" 
+            usage
+            exit 1
+            ;;
+        ?)
+            printf "%s\n" "Error: unknown option -$OPTARG" 
+            usage
+            exit 1
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+
+set +u
+if [ -z "$port" ]; then
+  port=$(amidi -l | tail -n 1 | cut -d " " -f 3) 
+fi
+set -u
+
+if [ -z "$dirname" ]; then
+  printf "%s\n" "Error: you must specify a directory name using -s"
+  usage
+  exit 1
+fi
+
+# Creates a directory, if it not exist.
+if [ ! -e "$dirname" ]; then
+  mkdir "$dirname"; 
+fi
+
+sysdate=$(date --utc +'%Y-%m-%dT%H:%M:%S.%3NZ%n')
+
+# Identify device
+id=$(amidi -p "$port" -S "F0 7E 00 06 01 F7" -d -t 0.4)
+
+# Manufacturer ID
+man=("${id:16:2}")
+case "${man[@]}" in
+        52) mans=Zoom
+            ;;
+esac
+
+# Model ID
+mod=("${id:19:2}")
+case "${mod[@]}" in
+        4F) mods=B3
+            modsl=b3
+            ;;
+#        59) mods=G3x
+#            ;;
+#        ??) mods=G5
+#            ;;
+esac
+
+# System version
+verh=("${id:31:11}")
+
+# Convert hex2string
+vers=$(for c in $(echo "$verh"); do printf "\x$c"; done)
+
+# Unlock device:
+amidi -p "$port" -S "F0 ${man[*]} 00 ${mod[*]} 50 F7" -i 0.05
+
+# Store the current bank position before start backup
+pos=$(amidi -p "$port" -S "F0 ${man[*]} 00 ${mod[*]} 33 F7" -d -t 0.4)
+poscut=("${pos:19:27}")
+
+
+i=0
+for i in $(seq 00 01 99); do
+  varh=$(printf "%.2X\n" "$i")
+
+  # Change Patch from A0 to J9:
+  amidi -p "$port" -S "C0 $varh" -i 0.05
+
+  # Request global patch configuration with bank information:
+  sysex=$(amidi -p "$port" -S "F0 ${man[*]} 00 ${mod[*]} 09 00 00 $varh F7" -d -t 0.4)
+
+  # Cut the answer to position of hex filename:
+  namecuth=("${sysex:181:17} ${sysex:202:11}")
+
+  # Convert hex to string:
+  namecuts=$(for c in $(echo "${namecuth[*]}"); do printf "\x$c"; done;)
+
+  # CC extract:
+  cccuth=("${sysex:22:2}")
+
+######### not silent #################
+  ## Request current patch configuration:
+  sysex1=$(amidi -p "$port" -S "F0 ${man[*]} 00 ${mod[*]} 29 F7" -d -t 0.4)
+  ## Cut the answer to position of hex filename:
+#  namecuth1=("${sysex:166:17} ${sysex:187:11}")
+#######################################
+
+  ## Save Patch to a plain text file:
+  printf "%s\n" "$sysdate" > "$dirname"/"$namecuts".txt
+  printf "%s\n" "Manufacturer: ${mans[*]} (ID: ${man[*]})" >>"$dirname"/"$namecuts".txt 2>&1
+  printf "%s\n" "Model: $mods (ID: ${mod[*]})" >>"$dirname"/"$namecuts".txt 2>&1
+  printf "%s\n" "System Version: $vers" >>"$dirname"/"$namecuts".txt 2>&1
+  printf "%s\n" "Patchname: $namecuts" >>"$dirname"/"$namecuts".txt 2>&1
+
+  banks=$(printf "%X\n" "$((0x"$varh" + 0xBE))")
+
+  printf "%s\n" "Bank Location: ${cccuth[*]} (CC) / Bank: $banks (works only up to F9 (CC 3B))" >>"$dirname"/"$namecuts".txt 2>&1
+  printf "%s" "SysEx Message with location (78 byte):" >>"$dirname"/"$namecuts".txt 2>&1
+  printf "%s\n" "$sysex" >>"$dirname"/"$namecuts".txt 2>&1
+  printf "%s" "SysEX message of current patch without location (68 byte):" >>"$dirname"/"$namecuts".txt 2>&1
+  printf "%s\n" "$sysex1" >>"$dirname"/"$namecuts".txt 2>&1
+  printf "%s\n" "Path: $dirname" >>"$dirname"/"$namecuts".txt 2>&1
+  printf "%s\n" "Description:" >>"$dirname"/"$namecuts".txt 2>&1
+  
+  # Save Patch to (amidi) SysEx file:
+  amidi -p "$port" -S "F0 ${man[*]} 00 ${mod[*]} 29 F7" -r "$dirname"/"$namecuts"."$modsl"x -t 0.4
+
+  if [ ! -e "$dirname/$bankname" ]; then
+    mkdir "$dirname"/"$bankname"; 
+  fi  
+
+  db=("$dirname"/"$bankname")
+  amidi -p "$port" -S "F0 ${man[*]} 00 ${mod[*]} 09 00 00 $varh F7" -r "${db[*]}"/"${cccuth[*]}""_""$namecuts"."$modsl"z -t 0.4
+#  amidi -p "$port" -S "F0 ${man[*]} 00 ${mod[*]} 09 00 00 $varh F7" -r "$dirname"/"$cccuth""_""$namecuts".b3z -t 0.4
+
+  ## Save Patch to a .b3p file. Need to reverse engineering the messages first.
+  ## "F0 "${man[@]}" 00 ${mod[*]} 09 00 00 $varh F7" or/and "F0 "${man[@]}" 00 "${mod[@]}" 29 F7"
+
+  if [ ! -e "$dirname/b3p" ]; then
+    mkdir "$dirname"/b3p; 
+  fi 
+
+  printf "%s\n" "<?xml version="1.0" encoding="UTF-8"?>" > "$dirname"/b3p/"$namecuts"."$modsl"p
+  printf "%s\n" "" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "<PatchData>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "  <Product>$mods</Product>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "  <Name>$namecuts</Name>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "  <Tooltip></Tooltip>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "  <Version>$vers</Version>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "  <Module0>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm0></Prm0>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm1></Prm1>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm2></Prm2>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm3></Prm3>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm4></Prm4>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm5></Prm5>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm6></Prm6>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm7></Prm7>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm8></Prm8>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm9></Prm9>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm10></Prm10>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "  </Module0>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "  <Module1>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm0></Prm0>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm1></Prm1>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm2></Prm2>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm3></Prm3>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm4></Prm4>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm5></Prm5>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm6></Prm6>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm7></Prm7>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm8></Prm8>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm9></Prm9>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm10></Prm10>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "  </Module1>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "  <Module2>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm0></Prm0>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm1></Prm1>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm2></Prm2>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm3></Prm3>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm4></Prm4>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm5></Prm5>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm6></Prm6>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm7></Prm7>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm8></Prm8>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm9></Prm9>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm10></Prm10>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "  </Module2>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "  <Module3>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm0></Prm0>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm1></Prm1>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm2></Prm2>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm3></Prm3>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm4></Prm4>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm5></Prm5>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm6>0</Prm6>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm7></Prm7>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm8>0</Prm8>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm9>0</Prm9>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm10>0</Prm10>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "  </Module3>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "  <Module4>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm0>0</Prm0>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm1>0</Prm1>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm2>0</Prm2>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm3>0</Prm3>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm4>0</Prm4>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm5>0</Prm5>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm6>0</Prm6>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm7>0</Prm7>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm8>0</Prm8>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm9>0</Prm9>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "    <Prm10>0</Prm10>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "  </Module4>" >> "$dirname"/b3p/"$namecuts".b3p
+  printf "%s\n" "</PatchData>" >> "$dirname"/b3p/"$namecuts".b3p
+
+  # Save complete bank to an own .xml-file-structure:
+
+  varh=$((i ++))
+done
+
+## Jump back to last patch used
+amidi -p "$port" -S "${poscut[*]}"
+
+sleep 0.4
+## Lock device again:
+amidi -p "$port" -S "F0 ${man[*]} 00 ${mod[*]} 51 F7"
